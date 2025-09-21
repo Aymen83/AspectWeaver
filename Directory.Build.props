@@ -1,0 +1,23 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Authors>Aymen83</Authors>
+    <Company>Aymen83</Company>
+    <Product>AspectWeaver</Product>
+    <Copyright>Copyright (c) Aymen83 $([System.DateTime]::Now.Year)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Aymen83/AspectWeaver</RepositoryUrl>
+  </PropertyGroup>
+</Project>
