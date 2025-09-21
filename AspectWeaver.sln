@@ -17,7 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspectWeaver.Tests.Integrat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{9C8CB701-102D-CF49-A3E0-89AC09D42C2C}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
@@ -87,5 +90,8 @@ Global
 		{153DB14C-CABC-48E1-814B-C20E5B527959} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{DA4B248E-48F5-4096-A6A6-88594CAE5B8F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{4BA3A12C-C74B-4499-AC9D-6D2896DECC6C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E1D6CC4F-9DE0-4635-9762-4017CC15BFC3}
 	EndGlobalSection
 EndGlobal
