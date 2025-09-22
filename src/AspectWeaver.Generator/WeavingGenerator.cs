@@ -1,8 +1,10 @@
-﻿using AspectWeaver.Generator.Analysis; // Import Analysis namespace
+﻿using AspectWeaver.Generator.Analysis;
+using AspectWeaver.Generator.Emitters; // Import Emitters
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System.Linq; // Required for LINQ extensions
+using System.Collections.Immutable; // Import ImmutableArray
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -18,19 +20,16 @@ namespace AspectWeaver.Generator
             // 1. Inject prerequisites
             RegisterPrerequisites(context);
 
-            // 2. Define the analysis pipeline
+            // 2. Define the analysis pipeline (Steps 2.1 to 2.3 remain the same)
 
-            // Step 2.1: Efficiently get the symbol for AspectAttribute. Runs once per compilation update.
             var aspectAttributeSymbolProvider = context.CompilationProvider.Select((compilation, token) =>
                 compilation.GetTypeByMetadataName(AspectAttributeFullName));
 
-            // Step 2.2: Find all invocation sites (Fast Syntax-based filtering).
             var invocationProvider = context.SyntaxProvider.CreateSyntaxProvider(
                 predicate: static (node, _) => IsPotentialInterceptionSite(node),
                 transform: static (ctx, token) => (InvocationExpressionSyntax)ctx.Node
             );
 
-            // Step 2.3: Combine Invocations, Compilation (for SemanticModel), and the AspectAttribute symbol.
             var combinedProvider = invocationProvider
                 .Combine(context.CompilationProvider)
                 .Combine(aspectAttributeSymbolProvider);
@@ -40,28 +39,40 @@ namespace AspectWeaver.Generator
             {
                 var ((invocation, compilation), aspectBaseSymbol) = pair;
 
-                // Safety check: If AspectWeaver.Abstractions is not referenced, the symbol is null.
                 if (aspectBaseSymbol == null) return null;
 
-                // Get the SemanticModel for the specific SyntaxTree being analyzed.
                 var semanticModel = compilation.GetSemanticModel(invocation.SyntaxTree);
 
                 return AnalyzeInvocation(invocation, aspectBaseSymbol, token, semanticModel);
             })
             .Where(target => target != null)
             .Select((target, _) => target!)
-            // CRITICAL: Apply the custom comparer for efficient caching when models contain symbols.
             .WithComparer(InterceptionTargetComparer.Instance);
 
-            // 3. Register the output (Implementation in PBI 2.4+)
-            context.RegisterSourceOutput(interceptionTargets.Collect(), (ctx, targets) =>
-            {
-                // This block will implement the code generation in the next PBI.
-                // For now, we leave it empty, but the pipeline is active.
-            });
+            // 3. Register the output (Generation Phase)
+            // Collect all targets found across the compilation and pass them to the execution method.
+            context.RegisterSourceOutput(interceptionTargets.Collect(), ExecuteGeneration);
         }
 
-        // (RegisterPrerequisites remains the same)
+        /// <summary>
+        /// Executes the code generation phase based on the collected analysis results.
+        /// </summary>
+        private static void ExecuteGeneration(SourceProductionContext context, ImmutableArray<InterceptionTarget> targets)
+        {
+            // Optimization: If no targets were found, do nothing.
+            if (targets.IsDefaultOrEmpty) return;
+
+            // Use the Emitter to generate the C# source code.
+            var generatedSource = InterceptorEmitter.Emit(targets);
+
+            if (!string.IsNullOrEmpty(generatedSource))
+            {
+                // Add the generated source file to the compilation output.
+                context.AddSource("AspectWeaver.Interceptors.g.cs", SourceText.From(generatedSource, Encoding.UTF8));
+            }
+        }
+
+        // (RegisterPrerequisites, IsPotentialInterceptionSite, AnalyzeInvocation methods remain the same)
         private static void RegisterPrerequisites(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(ctx =>
@@ -71,18 +82,11 @@ namespace AspectWeaver.Generator
             });
         }
 
-        /// <summary>
-        /// Fast syntax-based filtering (predicate).
-        /// </summary>
         private static bool IsPotentialInterceptionSite(SyntaxNode node)
         {
-            // We are looking for method calls.
             return node is InvocationExpressionSyntax;
         }
 
-        /// <summary>
-        /// Semantic analysis (transform).
-        /// </summary>
         private static InterceptionTarget? AnalyzeInvocation(
             InvocationExpressionSyntax invocation,
             INamedTypeSymbol aspectBaseSymbol,
@@ -91,13 +95,11 @@ namespace AspectWeaver.Generator
         {
             token.ThrowIfCancellationRequested();
 
-            // Get the symbol of the method being invoked.
             if (semanticModel.GetSymbolInfo(invocation, token).Symbol is not IMethodSymbol methodSymbol)
             {
                 return null;
             }
 
-            // Analyze the method hierarchy to find applied aspects.
             var appliedAspects = TargetAnalyzer.FindApplicableAspects(methodSymbol, aspectBaseSymbol);
 
             if (appliedAspects.IsEmpty)
@@ -105,7 +107,6 @@ namespace AspectWeaver.Generator
                 return null;
             }
 
-            // Calculate the precise location of the identifier.
             var location = TargetAnalyzer.CalculateIdentifierLocation(invocation, token);
 
             return new InterceptionTarget(methodSymbol, location, appliedAspects);
