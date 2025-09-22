@@ -72,13 +72,17 @@ namespace AspectWeaver.Generator
             }
         }
 
-        // (RegisterPrerequisites, IsPotentialInterceptionSite, AnalyzeInvocation methods remain the same)
         private static void RegisterPrerequisites(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(ctx =>
             {
-                var sourceText = SourceText.From(SourceTemplates.InterceptsLocationAttributeSource, Encoding.UTF8);
-                ctx.AddSource("InterceptsLocationAttribute.g.cs", sourceText);
+                // Inject InterceptsLocationAttribute
+                var sourceText1 = SourceText.From(SourceTemplates.InterceptsLocationAttributeSource, Encoding.UTF8);
+                ctx.AddSource("InterceptsLocationAttribute.g.cs", sourceText1);
+
+                // Inject PlaceholderServiceProvider
+                var sourceText2 = SourceText.From(SourceTemplates.PlaceholderServiceProviderSource, Encoding.UTF8);
+                ctx.AddSource("PlaceholderServiceProvider.g.cs", sourceText2);
             });
         }
 

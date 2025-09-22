@@ -12,7 +12,7 @@ namespace AspectWeaver.Generator.Emitters
 
         public static string Emit(ImmutableArray<InterceptionTarget> targets)
         {
-            // We use Distinct() with the comparer as a safety measure against potential duplicates in the pipeline.
+            // (Distinct check remains the same)
             var distinctTargets = targets.Distinct(InterceptionTargetComparer.Instance).ToList();
 
             if (distinctTargets.Count == 0)
@@ -30,7 +30,6 @@ namespace AspectWeaver.Generator.Emitters
             writer.WriteLine($"namespace {GeneratedNamespace}");
             writer.OpenBlock();
 
-            // Interceptors must be hosted in a static class.
             writer.WriteLine($"internal static class {GeneratedClassName}");
             writer.OpenBlock();
 
@@ -39,7 +38,6 @@ namespace AspectWeaver.Generator.Emitters
             {
                 if (counter > 0) writer.WriteLine();
 
-                // Generate a unique name for the interceptor method. C# 12 requires one method per location.
                 var interceptorName = $"InterceptMethod{counter}";
                 EmitInterceptorMethod(writer, target, interceptorName);
                 counter++;
@@ -53,58 +51,30 @@ namespace AspectWeaver.Generator.Emitters
 
         private static void EmitInterceptorMethod(IndentedWriter writer, InterceptionTarget target, string interceptorName)
         {
-            var method = target.TargetMethod;
-            var signature = new MethodSignature(method);
+            // Use the enhanced MethodSignature analysis.
+            var signature = new MethodSignature(target.TargetMethod);
 
             // 1. Emit [InterceptsLocation] attribute
             EmitInterceptsLocationAttribute(writer, target.Location);
 
             // 2. Emit the method signature
+            // PBI 2.6: Add 'async' modifier here if signature.IsAsync.
             writer.Write($"internal static {signature.ReturnType} {interceptorName}{signature.GenericTypeParameters}(");
             writer.Write(signature.Parameters);
             writer.WriteLine($"){signature.GenericConstraints}");
 
-            // 3. Emit the method body (PBI 2.4: Passthrough implementation)
+            // 3. Emit the method body (Now using PipelineEmitter)
             writer.OpenBlock();
-            EmitPassthroughBody(writer, method, signature);
+            PipelineEmitter.EmitPipeline(writer, target, signature);
             writer.CloseBlock();
         }
 
         private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
         {
-            // Use C# Raw String Literal ("""...""") for the file path.
-            // This handles backslashes and quotes correctly without manual escaping.
-            // PolySharp ensures this works even when targeting .NET Standard 2.0.
+            // (Implementation remains the same)
             writer.WriteLine($"[InterceptsLocation(\"\"\"{location.FilePath}\"\"\", {location.Line}, {location.Character})]");
         }
 
-        private static void EmitPassthroughBody(IndentedWriter writer, IMethodSymbol method, MethodSignature signature)
-        {
-            // Determine the target of the call.
-            string callTarget;
-            if (signature.IsInstanceMethod)
-            {
-                // Use the instance parameter name.
-                callTarget = MethodSignature.InstanceParameterName;
-            }
-            else
-            {
-                // Use the fully qualified type name for static methods.
-                callTarget = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
-            }
-
-            // Construct the call expression.
-            // Note: We reuse GenericTypeParameters here for the call arguments.
-            string callExpression = $"{callTarget}.{method.Name}{signature.GenericTypeParameters}({signature.Arguments});";
-
-            if (method.ReturnsVoid)
-            {
-                writer.WriteLine(callExpression);
-            }
-            else
-            {
-                writer.WriteLine($"return {callExpression}");
-            }
-        }
+        // The EmitPassthroughBody method should be removed as it's moved to PipelineEmitter.
     }
 }

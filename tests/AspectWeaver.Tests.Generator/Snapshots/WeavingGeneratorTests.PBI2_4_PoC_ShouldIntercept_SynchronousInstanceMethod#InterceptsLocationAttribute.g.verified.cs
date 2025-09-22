@@ -20,9 +20,6 @@ namespace System.Runtime.CompilerServices
         /// <summary>
         /// Initializes a new instance of the <see cref="InterceptsLocationAttribute"/> class.
         /// </summary>
-        /// <param name="filePath">The path to the source file containing the invocation.</param>
-        /// <param name="line">The line number of the invocation (1-based).</param>
-        /// <param name="character">The character position within the line of the invocation (1-based).</param>
         public InterceptsLocationAttribute(string filePath, int line, int character)
         {
             // The compiler utilizes these parameters intrinsically; the body can be empty.
