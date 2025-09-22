@@ -1,18 +1,22 @@
-﻿using AspectWeaver.Generator.Analysis;
+﻿// src/AspectWeaver.Generator/Emitters/InterceptorEmitter.cs
+using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
+// Import the specific Roslyn namespace for literal formatting
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace AspectWeaver.Generator.Emitters
 {
     internal static class InterceptorEmitter
     {
+        // ... (Constants and Emit method remain the same)
         private const string GeneratedNamespace = "AspectWeaver.Generated";
         private const string GeneratedClassName = "Interceptors";
 
         public static string Emit(ImmutableArray<InterceptionTarget> targets)
         {
-            // (Distinct check remains the same)
+            // (Implementation of Emit remains the same...)
             var distinctTargets = targets.Distinct(InterceptionTargetComparer.Instance).ToList();
 
             if (distinctTargets.Count == 0)
@@ -23,7 +27,6 @@ namespace AspectWeaver.Generator.Emitters
             using var writer = new IndentedWriter();
             writer.WriteFileHeader();
 
-            // Usings required by the generated code.
             writer.WriteLine("using System.Runtime.CompilerServices;");
             writer.WriteLine();
 
@@ -49,21 +52,23 @@ namespace AspectWeaver.Generator.Emitters
             return writer.ToString();
         }
 
+
         private static void EmitInterceptorMethod(IndentedWriter writer, InterceptionTarget target, string interceptorName)
         {
-            // Use the enhanced MethodSignature analysis.
+            // (Implementation remains the same, but calls the fixed EmitInterceptsLocationAttribute)
             var signature = new MethodSignature(target.TargetMethod);
 
             // 1. Emit [InterceptsLocation] attribute
             EmitInterceptsLocationAttribute(writer, target.Location);
 
             // 2. Emit the method signature
-            // PBI 2.6: Add 'async' modifier here if signature.IsAsync.
-            writer.Write($"internal static {signature.ReturnType} {interceptorName}{signature.GenericTypeParameters}(");
+            string asyncModifier = signature.IsAsync ? "async " : "";
+
+            writer.Write($"internal static {asyncModifier}{signature.ReturnType} {interceptorName}{signature.GenericTypeParameters}(");
             writer.Write(signature.Parameters);
             writer.WriteLine($"){signature.GenericConstraints}");
 
-            // 3. Emit the method body (Now using PipelineEmitter)
+            // 3. Emit the method body
             writer.OpenBlock();
             PipelineEmitter.EmitPipeline(writer, target, signature);
             writer.CloseBlock();
@@ -71,10 +76,12 @@ namespace AspectWeaver.Generator.Emitters
 
         private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
         {
-            // (Implementation remains the same)
-            writer.WriteLine($"[InterceptsLocation(\"\"\"{location.FilePath}\"\"\", {location.Line}, {location.Character})]");
-        }
+            // FIX: Use the standard FormatLiteral signature with positional arguments for compatibility.
+            // Signature: FormatLiteral(string value, bool quote)
+            // This generates a correctly escaped standard C# string literal.
+            string filePathLiteral = SymbolDisplay.FormatLiteral(location.FilePath, true);
 
-        // The EmitPassthroughBody method should be removed as it's moved to PipelineEmitter.
+            writer.WriteLine($"[InterceptsLocation({filePathLiteral}, {location.Line}, {location.Character})]");
+        }
     }
 }

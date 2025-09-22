@@ -9,7 +9,6 @@ public class WeavingGeneratorTests
     [Fact]
     public Task Generator_WhenInputIsEmpty_ShouldOnlyGeneratePrerequisites()
     {
-        // (Existing test remains)
         var input = """
                     // Empty input code
                     """;
@@ -30,7 +29,8 @@ public class WeavingGeneratorTests
             {
                 public class MyService
                 {
-                    [MyTestAspect]
+                    // Use full attribute name
+                    [MyTestAspectAttribute]
                     public virtual int CalculateValue(int input, string prefix = "A")
                     {
                         return input * 2;
@@ -66,7 +66,8 @@ public class WeavingGeneratorTests
             {
                 public static class StaticService
                 {
-                    [MyTestAspect]
+                    // Use full attribute name
+                    [MyTestAspectAttribute]
                     public static void LogMessage(string message)
                     {
                         System.Console.WriteLine(message);
@@ -100,7 +101,8 @@ public class WeavingGeneratorTests
             {
                 public class ComplexService
                 {
-                    [RefOutAspect]
+                    // Use full attribute name
+                    [RefOutAspectAttribute]
                     public bool TryParse(string input, out int value, ref bool initialized)
                     {
                         value = 42;
@@ -118,6 +120,154 @@ public class WeavingGeneratorTests
                         int val;
                         // Interception site
                         service.TryParse("test", out val, ref init);
+                    }
+                }
+            }
+            """;
+
+        return GeneratorTestHelper.Verify(input);
+    }
+
+    // PBI 2.6 Tests
+
+    [Fact]
+    public Task PBI2_6_Async_ShouldIntercept_Task()
+    {
+        var input = """
+            using AspectWeaver.Abstractions;
+            using System.Threading.Tasks;
+
+            public class AsyncAspectAttribute : AspectAttribute { }
+
+            namespace TestApp
+            {
+                public class AsyncService
+                {
+                    // Use full attribute name
+                    [AsyncAspectAttribute]
+                    public virtual Task DoWorkAsync()
+                    {
+                        return Task.CompletedTask;
+                    }
+                }
+
+                public class Program
+                {
+                    public static async Task Main()
+                    {
+                        var service = new AsyncService();
+                        // Interception site
+                        await service.DoWorkAsync();
+                    }
+                }
+            }
+            """;
+
+        return GeneratorTestHelper.Verify(input);
+    }
+
+    [Fact]
+    public Task PBI2_6_Async_ShouldIntercept_ValueTask()
+    {
+        var input = """
+            using AspectWeaver.Abstractions;
+            using System.Threading.Tasks;
+
+            public class AsyncAspectAttribute : AspectAttribute { }
+
+            namespace TestApp
+            {
+                public class AsyncService
+                {
+                    // Use full attribute name
+                    [AsyncAspectAttribute]
+                    public virtual ValueTask DoWorkValueAsync()
+                    {
+                        return default;
+                    }
+                }
+
+                public class Program
+                {
+                    public static async Task Main()
+                    {
+                        var service = new AsyncService();
+                        // Interception site
+                        await service.DoWorkValueAsync();
+                    }
+                }
+            }
+            """;
+
+        return GeneratorTestHelper.Verify(input);
+    }
+
+    [Fact]
+    public Task PBI2_6_Async_ShouldIntercept_TaskOfT()
+    {
+        var input = """
+            using AspectWeaver.Abstractions;
+            using System.Threading.Tasks;
+
+            // Testing attribute constructor rehydration
+            public class AsyncAspectAttribute : AspectAttribute { public AsyncAspectAttribute(string config) {} }
+
+            namespace TestApp
+            {
+                public class AsyncService
+                {
+                    // Use full attribute name
+                    [AsyncAspectAttribute("ConfigValue", Order = 5)]
+                    public virtual Task<int> CalculateAsync()
+                    {
+                        return Task.FromResult(42);
+                    }
+                }
+
+                public class Program
+                {
+                    public static async Task Main()
+                    {
+                        var service = new AsyncService();
+                        // Interception site
+                        int result = await service.CalculateAsync();
+                    }
+                }
+            }
+            """;
+
+        return GeneratorTestHelper.Verify(input);
+    }
+
+    [Fact]
+    public Task PBI2_6_Async_ShouldIntercept_ValueTaskOfT()
+    {
+        var input = """
+            using AspectWeaver.Abstractions;
+            using System.Threading.Tasks;
+
+            public class AsyncAspectAttribute : AspectAttribute { }
+
+            namespace TestApp
+            {
+                public class AsyncService
+                {
+                    // Testing attribute property rehydration
+                    // Use full attribute name
+                    [AsyncAspectAttribute(Order = 10)]
+                    public virtual ValueTask<string> FetchDataValueAsync()
+                    {
+                        return new ValueTask<string>("Data");
+                    }
+                }
+
+                public class Program
+                {
+                    public static async Task Main()
+                    {
+                        var service = new AsyncService();
+                        // Interception site
+                        string result = await service.FetchDataValueAsync();
                     }
                 }
             }
