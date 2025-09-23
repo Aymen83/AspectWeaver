@@ -3,7 +3,6 @@ using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Linq;
-// Import the specific Roslyn namespace for literal formatting
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace AspectWeaver.Generator.Emitters
@@ -55,7 +54,6 @@ namespace AspectWeaver.Generator.Emitters
 
         private static void EmitInterceptorMethod(IndentedWriter writer, InterceptionTarget target, string interceptorName)
         {
-            // (Implementation remains the same, but calls the fixed EmitInterceptsLocationAttribute)
             var signature = new MethodSignature(target.TargetMethod);
 
             // 1. Emit [InterceptsLocation] attribute
@@ -64,9 +62,17 @@ namespace AspectWeaver.Generator.Emitters
             // 2. Emit the method signature
             string asyncModifier = signature.IsAsync ? "async " : "";
 
+            // FIX: Simplified, robust formatting. Construct the full signature on one conceptual line.
+
             writer.Write($"internal static {asyncModifier}{signature.ReturnType} {interceptorName}{signature.GenericTypeParameters}(");
             writer.Write(signature.Parameters);
-            writer.WriteLine($"){signature.GenericConstraints}");
+            writer.Write(")");
+
+            // Append constraints directly (they include a leading space if they exist).
+            writer.Write(signature.GenericConstraints);
+
+            // Ensure the line ends before opening the block.
+            writer.WriteLine();
 
             // 3. Emit the method body
             writer.OpenBlock();
@@ -76,11 +82,9 @@ namespace AspectWeaver.Generator.Emitters
 
         private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
         {
-            // FIX: Use the standard FormatLiteral signature with positional arguments for compatibility.
+            // (Implementation remains the same using compatible FormatLiteral)
             // Signature: FormatLiteral(string value, bool quote)
-            // This generates a correctly escaped standard C# string literal.
             string filePathLiteral = SymbolDisplay.FormatLiteral(location.FilePath, true);
-
             writer.WriteLine($"[InterceptsLocation({filePathLiteral}, {location.Line}, {location.Character})]");
         }
     }
