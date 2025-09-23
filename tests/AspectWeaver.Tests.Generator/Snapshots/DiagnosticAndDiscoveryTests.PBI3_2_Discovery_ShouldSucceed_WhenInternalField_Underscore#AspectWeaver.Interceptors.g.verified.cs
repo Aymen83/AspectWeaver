@@ -11,8 +11,8 @@ namespace AspectWeaver.Generated
 {
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 22, 27)]
-        internal static void InterceptMethod0(string message)
+        [InterceptsLocation("[ScrubbedPath]", 21, 21)]
+        internal static void InterceptMethod0(this global::TestApp.MyService __instance)
         {
             // 1. Resolve IServiceProvider (Placeholder for Epic 3)
             global::System.IServiceProvider __serviceProvider = new global::AspectWeaver.Generated.PlaceholderServiceProvider();
@@ -20,29 +20,28 @@ namespace AspectWeaver.Generated
             // 2. Create InvocationContext
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
-                { "message", message },
             };
             var __context = new global::AspectWeaver.Abstractions.InvocationContext(
-                targetInstance: null,
+                targetInstance: __instance,
                 serviceProvider: __serviceProvider,
-                methodName: "LogMessage",
-                targetTypeName: "global::TestApp.StaticService",
+                methodName: "DoWork",
+                targetTypeName: "global::TestApp.MyService",
                 arguments: __arguments
             );
             
             // 3. Core: The original method call.
             global::System.Func<global::AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<global::AspectWeaver.Abstractions.VoidResult>> __pipeline = (ctx) =>
             {
-                global::TestApp.StaticService.LogMessage(message);
+                __instance.DoWork();
                 return new global::System.Threading.Tasks.ValueTask<global::AspectWeaver.Abstractions.VoidResult>(global::AspectWeaver.Abstractions.VoidResult.Instance);
             };
             
             // 4. Wrapping: Apply aspects (from inner to outer).
-            // Aspect 0: global::MyTestAspectAttribute (Order=0)
+            // Aspect 0: global::DIAttribute (Order=0)
             var __next0 = __pipeline;
-            var __handler0 = (global::AspectWeaver.Abstractions.IAspectHandler<global::MyTestAspectAttribute>)__serviceProvider.GetService(typeof(global::AspectWeaver.Abstractions.IAspectHandler<global::MyTestAspectAttribute>));
-            if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::MyTestAspectAttribute");
-            var __attribute0 = new global::MyTestAspectAttribute();
+            var __handler0 = (global::AspectWeaver.Abstractions.IAspectHandler<global::DIAttribute>)__serviceProvider.GetService(typeof(global::AspectWeaver.Abstractions.IAspectHandler<global::DIAttribute>));
+            if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::DIAttribute");
+            var __attribute0 = new global::DIAttribute();
             __pipeline = (ctx) =>
             {
                 return __handler0.InterceptAsync<global::AspectWeaver.Abstractions.VoidResult>(__attribute0, ctx, __next0);

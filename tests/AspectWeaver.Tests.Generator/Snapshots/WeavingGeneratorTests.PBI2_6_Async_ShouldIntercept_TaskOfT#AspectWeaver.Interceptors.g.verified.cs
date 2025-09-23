@@ -11,7 +11,7 @@ namespace AspectWeaver.Generated
 {
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 25, 40)]
+        [InterceptsLocation("[ScrubbedPath]", 30, 40)]
         internal static async global::System.Threading.Tasks.Task<int> InterceptMethod0(this global::TestApp.AsyncService __instance)
         {
             // 1. Resolve IServiceProvider (Placeholder for Epic 3)

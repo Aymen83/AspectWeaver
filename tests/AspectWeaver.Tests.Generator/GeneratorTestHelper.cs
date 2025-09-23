@@ -1,6 +1,6 @@
 ﻿// tests/AspectWeaver.Tests.Generator/GeneratorTestHelper.cs
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp; // Required for SymbolDisplay
+using Microsoft.CodeAnalysis.CSharp;
 using VerifyXunit;
 using AspectWeaver.Generator;
 using System.Collections.Generic;
@@ -9,71 +9,95 @@ using System.Linq;
 using System;
 using Basic.Reference.Assemblies;
 using AspectWeaver.Abstractions;
-using System.Text; // Required for StringBuilder
+using System.Text;
 
 namespace AspectWeaver.Tests.Generator;
 
 public static class GeneratorTestHelper
 {
+    // ... (Constants and Properties remain the same)
     private static readonly CSharpParseOptions ParseOptions = new(LanguageVersion.CSharp12);
     private static readonly IEnumerable<MetadataReference> References = LoadReferences();
-
-    // Define a constant mock file path for the simulation.
-    // Use a realistic path that requires escaping to validate the FormatLiteral fix.
     private const string MockFilePath = @"C:\Users\Aymen83\source\repos\AspectWeaver\tests\SimulatedSource.cs";
 
-    public static Task Verify(string sourceCode)
+
+    // PBI 3.2: Update Verify signature to accept expected diagnostic IDs.
+    public static Task Verify(string sourceCode, params string[] expectedDiagnosticIds)
     {
         // 1. Create the compilation object.
         var compilation = CreateCompilation(sourceCode);
 
-        // (Diagnostic checks 2-6 remain the same...)
+        // 2. Check for input diagnostics.
         var inputDiagnostics = compilation.GetDiagnostics();
-        if (inputDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+        // We only throw if input errors exist AND we didn't expect any diagnostics from the generator (as input errors might cascade).
+        if (expectedDiagnosticIds.Length == 0 && inputDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
         {
             throw new InvalidOperationException("Input compilation has errors. Generator results are unreliable.\n" + string.Join("\n", inputDiagnostics));
         }
 
+        // (Generator instantiation and driver creation remains the same...)
         var generator = new WeavingGenerator().AsSourceGenerator();
-
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
             generators: new[] { generator },
             parseOptions: ParseOptions);
 
+        // 5. Run the generator.
         driver = driver.RunGenerators(compilation);
 
+        // 6. Check for diagnostics produced during or after generation.
         var runResult = driver.GetRunResult();
         var generatedTrees = runResult.GeneratedTrees.ToArray();
-        var allDiagnostics = runResult.Diagnostics.Concat(generatedTrees.SelectMany(t => t.GetDiagnostics()));
+        // Combine all diagnostics (Generator execution + Generated code compilation).
+        var allDiagnostics = runResult.Diagnostics.Concat(generatedTrees.SelectMany(t => t.GetDiagnostics())).ToList();
 
-        if (allDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+        // PBI 3.2: Validate expected diagnostics.
+        var actualDiagnosticIds = allDiagnostics.Select(d => d.Id).ToHashSet();
+
+        if (expectedDiagnosticIds.Length > 0)
         {
-            throw new InvalidOperationException("Generator produced errors or the generated code is invalid:\n" + string.Join("\n", allDiagnostics));
+            // Ensure all expected diagnostics were reported.
+            if (!expectedDiagnosticIds.All(id => actualDiagnosticIds.Contains(id)))
+            {
+                throw new InvalidOperationException($"Expected diagnostics [{string.Join(", ", expectedDiagnosticIds)}] not fully found. Actual diagnostics:\n" + string.Join("\n", allDiagnostics));
+            }
+
+            // Ensure no unexpected errors occurred.
+            var unexpectedErrors = allDiagnostics.Where(d => d.Severity == DiagnosticSeverity.Error && !expectedDiagnosticIds.Contains(d.Id)).ToList();
+            if (unexpectedErrors.Any())
+            {
+                throw new InvalidOperationException("Generator produced unexpected errors:\n" + string.Join("\n", unexpectedErrors));
+            }
+        }
+        else
+        {
+            // If no diagnostics were expected, ensure no errors occurred.
+            if (allDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+            {
+                throw new InvalidOperationException("Generator produced errors or the generated code is invalid:\n" + string.Join("\n", allDiagnostics));
+            }
         }
 
-        // 7. Use Verify to assert the results.
+
+        // 7. Use Verify to assert the results (Snapshots the generated code).
         return Verifier.Verify(driver)
-            // FIX: Use AddScrubber for compatibility and robustness instead of ScrubInline.
             .AddScrubber(builder => ScrubFilePath(builder, MockFilePath))
             .UseDirectory("Snapshots");
     }
 
+    // ... (ScrubFilePath, CreateCompilation, LoadReferences remain the same)
     private static void ScrubFilePath(StringBuilder builder, string filePath)
     {
-        // We need to replace the exact string literal used in the generated code.
-        // We use FormatLiteral here (with the compatible signature) to ensure we match the generated format.
+        // Scrub the raw path (in case Verify snapshots diagnostic messages)
+        builder.Replace(filePath, "[ScrubbedPath]");
+        // Scrub the escaped literal (for generated code)
         var escapedFilePathLiteral = SymbolDisplay.FormatLiteral(filePath, true);
-
-        // Replace the actual path literal (including quotes) with a placeholder literal for portability.
         builder.Replace(escapedFilePathLiteral, "\"[ScrubbedPath]\"");
     }
 
     private static Compilation CreateCompilation(string source)
     {
-        // Provide the MockFilePath when parsing the text.
         var syntaxTree = CSharpSyntaxTree.ParseText(source, ParseOptions, path: MockFilePath);
 
-        // Configure compilation options.
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             .WithNullableContextOptions(NullableContextOptions.Enable);
 
@@ -84,7 +108,6 @@ public static class GeneratorTestHelper
             options: options);
     }
 
-    // (LoadReferences remains the same, utilizing Basic.Reference.Assemblies)
     private static IEnumerable<MetadataReference> LoadReferences()
     {
         var references = new List<MetadataReference>(Net80.References.All);

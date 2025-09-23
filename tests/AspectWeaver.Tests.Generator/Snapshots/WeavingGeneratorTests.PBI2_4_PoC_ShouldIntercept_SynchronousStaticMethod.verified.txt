@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+            // This is the invocation site we expect to intercept.
+            StaticService.LogMessage("Hello AspectWeaver");
+                          ^^^^^^^^^^
+        }
+*/
+ [ScrubbedPath]: (21,26)-(21,36),
+      Message: Static method 'LogMessage' cannot use aspects requiring dependency injection because there is no instance to provide the IServiceProvider,
+      Severity: Error,
+      Descriptor: {
+        Id: AW002,
+        Title: Aspects requiring DI are not supported on static methods,
+        Description: Aspect weaving with dependency injection relies on accessing IServiceProvider from the target instance, which is unavailable for static methods.,
+        MessageFormat: Static method '{0}' cannot use aspects requiring dependency injection because there is no instance to provide the IServiceProvider,
+        Category: AspectWeaver.DI,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-﻿using VerifyXunit;
+﻿// tests/AspectWeaver.Tests.Generator/WeavingGeneratorTests.cs
+using VerifyXunit;
 using Xunit;
 using System.Threading.Tasks;
 
@@ -21,6 +22,8 @@ public class WeavingGeneratorTests
         // Arrange
         var input = """
             using AspectWeaver.Abstractions;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             // Define a dummy aspect for testing purposes
             public class MyTestAspectAttribute : AspectAttribute { }
@@ -29,6 +32,9 @@ public class WeavingGeneratorTests
             {
                 public class MyService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Use full attribute name
                     [MyTestAspectAttribute]
                     public virtual int CalculateValue(int input, string prefix = "A")
@@ -86,7 +92,8 @@ public class WeavingGeneratorTests
             """;
 
         // Act & Assert
-        return GeneratorTestHelper.Verify(input);
+        // FIX: We now expect AW002 for static methods.
+        return GeneratorTestHelper.Verify(input, "AW002");
     }
 
     [Fact]
@@ -94,6 +101,8 @@ public class WeavingGeneratorTests
     {
         var input = """
             using AspectWeaver.Abstractions;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class RefOutAspectAttribute : AspectAttribute { }
 
@@ -101,6 +110,9 @@ public class WeavingGeneratorTests
             {
                 public class ComplexService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Use full attribute name
                     [RefOutAspectAttribute]
                     public bool TryParse(string input, out int value, ref bool initialized)
@@ -136,6 +148,8 @@ public class WeavingGeneratorTests
         var input = """
             using AspectWeaver.Abstractions;
             using System.Threading.Tasks;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class AsyncAspectAttribute : AspectAttribute { }
 
@@ -143,6 +157,9 @@ public class WeavingGeneratorTests
             {
                 public class AsyncService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Use full attribute name
                     [AsyncAspectAttribute]
                     public virtual Task DoWorkAsync()
@@ -172,6 +189,8 @@ public class WeavingGeneratorTests
         var input = """
             using AspectWeaver.Abstractions;
             using System.Threading.Tasks;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class AsyncAspectAttribute : AspectAttribute { }
 
@@ -179,6 +198,9 @@ public class WeavingGeneratorTests
             {
                 public class AsyncService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Use full attribute name
                     [AsyncAspectAttribute]
                     public virtual ValueTask DoWorkValueAsync()
@@ -208,6 +230,8 @@ public class WeavingGeneratorTests
         var input = """
             using AspectWeaver.Abstractions;
             using System.Threading.Tasks;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             // Testing attribute constructor rehydration
             public class AsyncAspectAttribute : AspectAttribute { public AsyncAspectAttribute(string config) {} }
@@ -216,6 +240,9 @@ public class WeavingGeneratorTests
             {
                 public class AsyncService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Use full attribute name
                     [AsyncAspectAttribute("ConfigValue", Order = 5)]
                     public virtual Task<int> CalculateAsync()
@@ -245,6 +272,8 @@ public class WeavingGeneratorTests
         var input = """
             using AspectWeaver.Abstractions;
             using System.Threading.Tasks;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class AsyncAspectAttribute : AspectAttribute { }
 
@@ -252,6 +281,9 @@ public class WeavingGeneratorTests
             {
                 public class AsyncService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Testing attribute property rehydration
                     // Use full attribute name
                     [AsyncAspectAttribute(Order = 10)]
@@ -282,10 +314,11 @@ public class WeavingGeneratorTests
     public Task PBI2_7_Generics_ShouldIntercept_MethodInGenericClass_NonGenericContext()
     {
         // Scenario: Calling a method in a generic class with specific types.
-        // Expectation: Interceptor is non-generic, 'this' parameter is specialized (e.g., Repository<User>).
         var input = """
             using AspectWeaver.Abstractions;
             using System.Collections.Generic;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class GenericAspectAttribute : AspectAttribute { }
 
@@ -294,6 +327,9 @@ public class WeavingGeneratorTests
                 // Generic Class
                 public class Repository<TEntity> where TEntity : class
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     [GenericAspectAttribute]
                     public virtual TEntity GetById(int id)
                     {
@@ -322,9 +358,10 @@ public class WeavingGeneratorTests
     public Task PBI2_7_Generics_ShouldIntercept_GenericMethod_NonGenericContext()
     {
         // Scenario: Calling a generic method with specific types.
-        // Expectation: Interceptor is non-generic, specialized to the types used (e.g., int Convert(string input)).
         var input = """
             using AspectWeaver.Abstractions;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class GenericAspectAttribute : AspectAttribute { }
 
@@ -332,6 +369,9 @@ public class WeavingGeneratorTests
             {
                 public class UtilityService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Generic Method
                     [GenericAspectAttribute]
                     public virtual TResult Convert<TInput, TResult>(TInput input)
@@ -359,9 +399,10 @@ public class WeavingGeneratorTests
     public Task PBI2_7_Generics_ShouldIntercept_GenericMethod_GenericContext()
     {
         // Scenario: Calling a generic method within a generic context.
-        // Expectation: Interceptor MUST be generic and replicate the context (e.g., T InterceptMethod<T>(...)).
         var input = """
             using AspectWeaver.Abstractions;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class GenericAspectAttribute : AspectAttribute { }
 
@@ -369,6 +410,9 @@ public class WeavingGeneratorTests
             {
                 public class UtilityService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     [GenericAspectAttribute]
                     public virtual T Echo<T>(T input) => input;
                 }
@@ -392,7 +436,6 @@ public class WeavingGeneratorTests
     public Task PBI2_7_Generics_ShouldIntercept_GenericMethodWithConstraints()
     {
         // Scenario: Calling a generic method with constraints within a compatible generic context.
-        // Expectation: Interceptor MUST replicate the constraints (e.g., where T : class, IDisposable, new()).
         var input = """
             using AspectWeaver.Abstractions;
             using System;
@@ -403,6 +446,9 @@ public class WeavingGeneratorTests
             {
                 public class ConstrainedService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     // Generic Method with complex constraints
                     [GenericAspectAttribute]
                     public virtual T Process<T>(T input)
@@ -432,10 +478,11 @@ public class WeavingGeneratorTests
     public Task PBI2_7_Generics_ShouldIntercept_AsyncGenericMethod()
     {
         // Scenario: Combining Async and Generics in a generic context.
-        // Expectation: Interceptor is async, generic, and includes constraints.
         var input = """
             using AspectWeaver.Abstractions;
             using System.Threading.Tasks;
+            // FIX: Add using System for IServiceProvider
+            using System;
 
             public class GenericAspectAttribute : AspectAttribute { }
 
@@ -443,6 +490,9 @@ public class WeavingGeneratorTests
             {
                 public class AsyncGenericService
                 {
+                    // FIX: Add accessible IServiceProvider to satisfy AW001.
+                    internal IServiceProvider ServiceProvider { get; } = null!;
+
                     [GenericAspectAttribute]
                     public virtual async Task<T> FetchAsync<T>(string key) where T : struct
                     {

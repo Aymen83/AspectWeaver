@@ -11,7 +11,7 @@ namespace AspectWeaver.Generated
 {
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 24, 34)]
+        [InterceptsLocation("[ScrubbedPath]", 29, 34)]
         internal static int InterceptMethod0(this global::TestApp.MyService __instance, int input, string prefix = "A")
         {
             // 1. Resolve IServiceProvider (Placeholder for Epic 3)
