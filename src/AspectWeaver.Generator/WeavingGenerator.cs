@@ -106,10 +106,8 @@ namespace AspectWeaver.Generator
                 var sourceText1 = SourceText.From(SourceTemplates.InterceptsLocationAttributeSource, Encoding.UTF8);
                 ctx.AddSource("InterceptsLocationAttribute.g.cs", sourceText1);
 
-                // PBI 3.2: Keep PlaceholderServiceProvider for now. It will be removed in PBI 3.3.
-                // This allows the current tests (which rely on the placeholder) to continue passing until PBI 3.3 is implemented.
-                var sourceText2 = SourceText.From(SourceTemplates.PlaceholderServiceProviderSource, Encoding.UTF8);
-                ctx.AddSource("PlaceholderServiceProvider.g.cs", sourceText2);
+                // PBI 3.3: Stop injecting PlaceholderServiceProvider
+                // The injection code previously here is removed.
             });
         }
 

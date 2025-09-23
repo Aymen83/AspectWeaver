@@ -2,7 +2,6 @@
 using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-// Import the specific Roslyn namespace for literal formatting
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace AspectWeaver.Generator.Emitters
@@ -26,30 +25,51 @@ namespace AspectWeaver.Generator.Emitters
 
         public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
         {
-            // (Implementation of EmitPipeline remains the same)
+            // Define the delegate type: Func<InvocationContext, ValueTask<TResult>>
             var delegateType = $"{FuncType}<{InvocationContextType}, {ValueTaskType}<{signature.LogicalResultType}>>";
 
-            EmitServiceProviderResolution(writer);
+            // 1. Resolve IServiceProvider (PBI 3.3: Updated implementation)
+            EmitServiceProviderResolution(writer, target);
 
+            // 2. Create InvocationContext
             string targetInstanceExpression = signature.IsInstanceMethod ? MethodSignature.InstanceParameterName : "null";
             EmitInvocationContext(writer, target, targetInstanceExpression);
 
+            // 3. Define the Core Delegate
             EmitCoreDelegate(writer, target, signature, delegateType);
 
+            // 4. Build the Aspect Chain
             EmitAspectChain(writer, target, signature);
 
+            // 5. Execute the Pipeline
             EmitPipelineExecution(writer, signature);
         }
 
-        #region Steps 1 and 2 (Updated for Robustness)
-        private static void EmitServiceProviderResolution(IndentedWriter writer)
+        #region Step 1: Service Provider Resolution (PBI 3.3 Implementation)
+        private static void EmitServiceProviderResolution(IndentedWriter writer, InterceptionTarget target)
         {
-            // (Implementation remains the same)
-            writer.WriteLine($"// 1. Resolve IServiceProvider (Placeholder for Epic 3)");
-            writer.WriteLine($"{IServiceProviderType} {ServiceProviderVar} = new global::AspectWeaver.Generated.PlaceholderServiceProvider();");
+            writer.WriteLine($"// 1. Resolve IServiceProvider");
+
+            // Use the access expression determined during analysis (e.g., "__instance.ServiceProvider").
+            // We know this expression is valid because the analysis phase (PBI 3.2) ensures it and filters out invalid targets (AW001/AW002).
+            var accessExpression = target.ProviderAccessExpression;
+
+            writer.WriteLine($"{IServiceProviderType} {ServiceProviderVar} = {accessExpression};");
+
+            // Runtime Safety Check: Ensure the provider is not null.
+            // This handles cases where the field/property exists but hasn't been initialized (e.g., constructor injection failure).
+            // We use the compatible FormatLiteral signature (string, bool).
+            var exceptionMessage = SymbolDisplay.FormatLiteral(
+                $"The IServiceProvider accessed via '{accessExpression}' returned null. Ensure the provider is correctly initialized on the instance.", true);
+
+            writer.WriteLine($"if ({ServiceProviderVar} == null) throw new {InvalidOperationExceptionType}({exceptionMessage});");
             writer.WriteLine();
         }
+        #endregion
 
+        // (All other methods remain the same as finalized in previous PBIs)
+
+        #region Step 2: Invocation Context
         private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression)
         {
             var method = target.TargetMethod;
@@ -60,7 +80,6 @@ namespace AspectWeaver.Generator.Emitters
             writer.OpenBlock();
             foreach (var param in method.Parameters)
             {
-                // FIX: Use positional arguments for compatibility.
                 var paramNameLiteral = SymbolDisplay.FormatLiteral(param.Name, true);
                 writer.WriteLine($"{{ {paramNameLiteral}, {param.Name} }},");
             }
@@ -69,7 +88,6 @@ namespace AspectWeaver.Generator.Emitters
             // 2.2. Create Context
             var typeName = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
 
-            // FIX: Use positional arguments for compatibility.
             string methodNameLiteral = SymbolDisplay.FormatLiteral(method.Name, true);
             string typeNameLiteral = SymbolDisplay.FormatLiteral(typeName, true);
 
@@ -86,13 +104,11 @@ namespace AspectWeaver.Generator.Emitters
             writer.WriteLine(");");
             writer.WriteLine();
         }
-
         #endregion
 
-        #region Step 3: Core Delegate (Unchanged from PBI 2.6)
+        #region Step 3: Core Delegate
         private static void EmitCoreDelegate(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string delegateType)
         {
-            // (Implementation remains the same as PBI 2.6)
             writer.WriteLine($"// 3. Core: The original method call.");
 
             string asyncModifier = signature.IsAsync ? "async " : "";
@@ -152,10 +168,9 @@ namespace AspectWeaver.Generator.Emitters
         }
         #endregion
 
-        #region Step 4: Aspect Chain (Updated for Robustness)
+        #region Step 4: Aspect Chain
         private static void EmitAspectChain(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
         {
-            // (Implementation remains the same)
             writer.WriteLine("// 4. Wrapping: Apply aspects (from inner to outer).");
 
             int index = target.AppliedAspects.Length;
@@ -179,7 +194,7 @@ namespace AspectWeaver.Generator.Emitters
             var handlerVar = $"__handler{index}";
             writer.WriteLine($"var {handlerVar} = ({handlerInterfaceType}){ServiceProviderVar}.GetService(typeof({handlerInterfaceType}));");
 
-            // FIX: Use FormatLiteral for the exception message for robustness.
+            // Use positional arguments for compatibility.
             var exceptionMessageLiteral = SymbolDisplay.FormatLiteral($"Handler not registered for aspect: {attributeType}", true);
             writer.WriteLine($"if ({handlerVar} == null) throw new {InvalidOperationExceptionType}({exceptionMessageLiteral});");
 
@@ -197,7 +212,6 @@ namespace AspectWeaver.Generator.Emitters
         #region Attribute Rehydration
         private static void EmitAttributeRehydration(IndentedWriter writer, string varName, string attributeType, AttributeData attributeData)
         {
-            // (Implementation remains the same, but calls the fixed TypedConstantToString)
             var constructorArgs = string.Join(", ", attributeData.ConstructorArguments.Select(arg => TypedConstantToString(arg)));
             var namedArgs = string.Join(", ", attributeData.NamedArguments.Select(kvp => $"{kvp.Key} = {TypedConstantToString(kvp.Value)}"));
 
@@ -216,31 +230,25 @@ namespace AspectWeaver.Generator.Emitters
             }
         }
 
-        // Helper to convert Roslyn TypedConstant to a C# literal string.
         private static string TypedConstantToString(TypedConstant constant)
         {
             if (constant.IsNull) return "null";
 
             if (constant.Kind == TypedConstantKind.Primitive)
             {
-                // FIX: Use SymbolDisplay.FormatLiteral for robust string/char generation.
                 if (constant.Value is string s)
                 {
-                    // Use verbatim format for strings.
                     return SymbolDisplay.FormatLiteral(s, true);
                 }
                 if (constant.Value is bool b) return b ? "true" : "false";
-                // Use FormatLiteral for char as well.
                 if (constant.Value is char c)
                 {
                     return SymbolDisplay.FormatLiteral(c, true);
                 }
 
-                // Ensure numeric types are formatted correctly (culture-invariant).
                 return global::System.Convert.ToString(constant.Value, global::System.Globalization.CultureInfo.InvariantCulture);
             }
 
-            // ... (Enum, Type, and default cases remain the same)
             if (constant.Kind == TypedConstantKind.Enum)
             {
                 var enumType = constant.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
@@ -257,11 +265,9 @@ namespace AspectWeaver.Generator.Emitters
         #endregion
         #endregion
 
-        // ... (EmitPipelineExecution, EmitAsyncPipelineExecution remain the same as PBI 2.6)
         #region Step 5: Execution
         private static void EmitPipelineExecution(IndentedWriter writer, MethodSignature signature)
         {
-            // (Implementation remains the same as PBI 2.6)
             writer.WriteLine("// 5. Execute the pipeline.");
 
             if (signature.IsAsync)
@@ -282,7 +288,6 @@ namespace AspectWeaver.Generator.Emitters
 
         private static void EmitAsyncPipelineExecution(IndentedWriter writer, MethodSignature signature)
         {
-            // (Implementation remains the same as PBI 2.6)
             writer.WriteLine("// Execution Mode: Asynchronous.");
 
             writer.WriteLine($"var __finalResult = await {PipelineVar}({ContextVar}).ConfigureAwait(false);");

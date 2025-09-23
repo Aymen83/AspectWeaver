@@ -14,8 +14,9 @@ namespace AspectWeaver.Generated
         [InterceptsLocation("[ScrubbedPath]", 21, 21)]
         internal static void InterceptMethod0(this global::TestApp.MyService __instance)
         {
-            // 1. Resolve IServiceProvider (Placeholder for Epic 3)
-            global::System.IServiceProvider __serviceProvider = new global::AspectWeaver.Generated.PlaceholderServiceProvider();
+            // 1. Resolve IServiceProvider
+            global::System.IServiceProvider __serviceProvider = __instance._serviceProvider;
+            if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance._serviceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
