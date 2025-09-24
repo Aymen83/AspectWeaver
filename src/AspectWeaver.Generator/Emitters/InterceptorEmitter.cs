@@ -15,7 +15,6 @@ namespace AspectWeaver.Generator.Emitters
 
         public static string Emit(ImmutableArray<InterceptionTarget> targets)
         {
-            // (Implementation of Emit remains the same...)
             var distinctTargets = targets.Distinct(InterceptionTargetComparer.Instance).ToList();
 
             if (distinctTargets.Count == 0)
@@ -26,6 +25,7 @@ namespace AspectWeaver.Generator.Emitters
             using var writer = new IndentedWriter();
             writer.WriteFileHeader();
 
+            // System.Runtime.CompilerServices is required for [InterceptsLocation] and [MethodImpl].
             writer.WriteLine("using System.Runtime.CompilerServices;");
             writer.WriteLine();
 
@@ -59,22 +59,23 @@ namespace AspectWeaver.Generator.Emitters
             // 1. Emit [InterceptsLocation] attribute
             EmitInterceptsLocationAttribute(writer, target.Location);
 
-            // 2. Emit the method signature
-            string asyncModifier = signature.IsAsync ? "async " : "";
+            // PBI 5.1: 2. Emit Performance Optimization Attribute
+            EmitPerformanceAttributes(writer);
 
-            // FIX: Simplified, robust formatting. Construct the full signature on one conceptual line.
+            // 3. Emit the method signature
+            string asyncModifier = signature.IsAsync ? "async " : "";
 
             writer.Write($"internal static {asyncModifier}{signature.ReturnType} {interceptorName}{signature.GenericTypeParameters}(");
             writer.Write(signature.Parameters);
             writer.Write(")");
 
-            // Append constraints directly (they include a leading space if they exist).
+            // Append constraints directly.
             writer.Write(signature.GenericConstraints);
 
             // Ensure the line ends before opening the block.
             writer.WriteLine();
 
-            // 3. Emit the method body
+            // 4. Emit the method body
             writer.OpenBlock();
             PipelineEmitter.EmitPipeline(writer, target, signature);
             writer.CloseBlock();
@@ -82,10 +83,18 @@ namespace AspectWeaver.Generator.Emitters
 
         private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
         {
-            // (Implementation remains the same using compatible FormatLiteral)
+            // (Implementation remains the same)
             // Signature: FormatLiteral(string value, bool quote)
             string filePathLiteral = SymbolDisplay.FormatLiteral(location.FilePath, true);
             writer.WriteLine($"[InterceptsLocation({filePathLiteral}, {location.Line}, {location.Character})]");
+        }
+
+        // PBI 5.1: New helper method for performance attributes.
+        private static void EmitPerformanceAttributes(IndentedWriter writer)
+        {
+            // Encourage the JIT compiler to inline the interceptor method.
+            // We use the fully qualified name (FQN) for maximum robustness.
+            writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
         }
     }
 }

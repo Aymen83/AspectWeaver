@@ -12,6 +12,7 @@ namespace AspectWeaver.Generated
     internal static class Interceptors
     {
         [InterceptsLocation("[ScrubbedPath]", 29, 27)]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static async global::System.Threading.Tasks.Task InterceptMethod0(this global::TestApp.AsyncService __instance)
         {
             // 1. Resolve IServiceProvider
