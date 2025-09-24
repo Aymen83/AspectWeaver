@@ -43,7 +43,7 @@ namespace AspectWeaver.Generated
             // 4. Wrapping: Apply aspects (from inner to outer).
             // Aspect 0: global::RefOutAspectAttribute (Order=0)
             var __next0 = __pipeline;
-            var __handler0 = (global::AspectWeaver.Abstractions.IAspectHandler<global::RefOutAspectAttribute>)__serviceProvider.GetService(typeof(global::AspectWeaver.Abstractions.IAspectHandler<global::RefOutAspectAttribute>));
+            var __handler0 = (global::AspectWeaver.Abstractions.IAspectHandler<global::RefOutAspectAttribute>?)__serviceProvider.GetService(typeof(global::AspectWeaver.Abstractions.IAspectHandler<global::RefOutAspectAttribute>));
             if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::RefOutAspectAttribute");
             var __attribute0 = new global::RefOutAspectAttribute();
             __pipeline = (ctx) =>

@@ -192,7 +192,7 @@ namespace AspectWeaver.Generator.Emitters
             writer.WriteLine($"var {nextVar} = {PipelineVar};");
 
             var handlerVar = $"__handler{index}";
-            writer.WriteLine($"var {handlerVar} = ({handlerInterfaceType}){ServiceProviderVar}.GetService(typeof({handlerInterfaceType}));");
+            writer.WriteLine($"var {handlerVar} = ({handlerInterfaceType}?){ServiceProviderVar}.GetService(typeof({handlerInterfaceType}));");
 
             // Use positional arguments for compatibility.
             var exceptionMessageLiteral = SymbolDisplay.FormatLiteral($"Handler not registered for aspect: {attributeType}", true);

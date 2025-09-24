@@ -40,7 +40,7 @@ namespace AspectWeaver.Generated
             // 4. Wrapping: Apply aspects (from inner to outer).
             // Aspect 0: global::AsyncAspectAttribute (Order=5)
             var __next0 = __pipeline;
-            var __handler0 = (global::AspectWeaver.Abstractions.IAspectHandler<global::AsyncAspectAttribute>)__serviceProvider.GetService(typeof(global::AspectWeaver.Abstractions.IAspectHandler<global::AsyncAspectAttribute>));
+            var __handler0 = (global::AspectWeaver.Abstractions.IAspectHandler<global::AsyncAspectAttribute>?)__serviceProvider.GetService(typeof(global::AspectWeaver.Abstractions.IAspectHandler<global::AsyncAspectAttribute>));
             if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::AsyncAspectAttribute");
             var __attribute0 = new global::AsyncAspectAttribute("ConfigValue")
             {
