@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic; // Required for IReadOnlyDictionary in .NET Standard 2.0
+using System.Collections.Generic;
+using System.Reflection; // Required for MethodInfo
 
 namespace AspectWeaver.Abstractions
 {
@@ -18,20 +19,23 @@ namespace AspectWeaver.Abstractions
         public InvocationContext(
             object? targetInstance,
             IServiceProvider serviceProvider,
+            // PBI 4.2: Add MethodInfo parameter (reordered for logical grouping)
+            MethodInfo methodInfo,
             string methodName,
             string targetTypeName,
             IReadOnlyDictionary<string, object?> arguments)
         {
-            // Enforce invariants: these properties are essential and must not be null.
-            // We use standard null checks for .NET Standard 2.0 compatibility and performance.
+            // Enforce invariants.
             ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            // PBI 4.2: Initialize and validate MethodInfo.
+            MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
             MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
             TargetTypeName = targetTypeName ?? throw new ArgumentNullException(nameof(targetTypeName));
             Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
             TargetInstance = targetInstance;
         }
 
-        #region PBI 1.3 - Core Properties and Environment
+        #region Core Properties and Environment
 
         /// <summary>
         /// Gets the instance of the object on which the method is being invoked.
@@ -41,7 +45,6 @@ namespace AspectWeaver.Abstractions
 
         /// <summary>
         /// Gets the <see cref="IServiceProvider"/> associated with the current execution scope.
-        /// This allows aspect handlers to resolve dependencies.
         /// </summary>
         public IServiceProvider ServiceProvider { get; }
 
@@ -55,23 +58,19 @@ namespace AspectWeaver.Abstractions
         /// </summary>
         public string TargetTypeName { get; }
 
-        // Note: We explicitly avoid exposing System.Reflection.MethodInfo
-        // to adhere to the zero-overhead principle (prevent runtime reflection).
+        /// <summary>
+        /// Gets a read-only dictionary containing the arguments passed to the intercepted method.
+        /// </summary>
+        public IReadOnlyDictionary<string, object?> Arguments { get; }
 
         #endregion
 
-        #region PBI 1.4 - Argument Access
-
+        #region PBI 4.2 - Reflection Metadata
         /// <summary>
-        /// Gets a read-only dictionary containing the arguments passed to the intercepted method.
-        /// The keys are the parameter names, and the values are the argument values.
+        /// Gets the <see cref="System.Reflection.MethodInfo"/> representing the intercepted method.
+        /// This allows access to method attributes, parameters metadata, and generic type arguments.
         /// </summary>
-        /// <remarks>
-        /// // TODO: Post-MVP Optimization: Implement zero-allocation argument access (e.g., using a struct-based accessor).
-        /// Currently, this MVP implementation may cause boxing for value types.
-        /// </remarks>
-        public IReadOnlyDictionary<string, object?> Arguments { get; }
-
+        public MethodInfo MethodInfo { get; }
         #endregion
     }
 }

@@ -22,16 +22,17 @@ namespace AspectWeaver.Generator.Emitters
         private const string ContextVar = "__context";
         private const string PipelineVar = "__pipeline";
         private const string ServiceProviderVar = "__serviceProvider";
+        // PBI 4.2: New variable name
+        private const string MethodInfoVar = "__methodInfo";
 
         public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
         {
-            // Define the delegate type: Func<InvocationContext, ValueTask<TResult>>
             var delegateType = $"{FuncType}<{InvocationContextType}, {ValueTaskType}<{signature.LogicalResultType}>>";
 
-            // 1. Resolve IServiceProvider (PBI 3.3: Updated implementation)
+            // 1. Resolve IServiceProvider
             EmitServiceProviderResolution(writer, target);
 
-            // 2. Create InvocationContext
+            // 2. Create InvocationContext (Updated for PBI 4.2)
             string targetInstanceExpression = signature.IsInstanceMethod ? MethodSignature.InstanceParameterName : "null";
             EmitInvocationContext(writer, target, targetInstanceExpression);
 
@@ -50,15 +51,11 @@ namespace AspectWeaver.Generator.Emitters
         {
             writer.WriteLine($"// 1. Resolve IServiceProvider");
 
-            // Use the access expression determined during analysis (e.g., "__instance.ServiceProvider").
-            // We know this expression is valid because the analysis phase (PBI 3.2) ensures it and filters out invalid targets (AW001/AW002).
             var accessExpression = target.ProviderAccessExpression;
 
             writer.WriteLine($"{IServiceProviderType} {ServiceProviderVar} = {accessExpression};");
 
-            // Runtime Safety Check: Ensure the provider is not null.
-            // This handles cases where the field/property exists but hasn't been initialized (e.g., constructor injection failure).
-            // We use the compatible FormatLiteral signature (string, bool).
+            // Runtime Safety Check
             var exceptionMessage = SymbolDisplay.FormatLiteral(
                 $"The IServiceProvider accessed via '{accessExpression}' returned null. Ensure the provider is correctly initialized on the instance.", true);
 
@@ -67,25 +64,27 @@ namespace AspectWeaver.Generator.Emitters
         }
         #endregion
 
-        // (All other methods remain the same as finalized in previous PBIs)
-
-        #region Step 2: Invocation Context
+        #region Step 2: Invocation Context (PBI 4.2 Implementation)
         private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression)
         {
             var method = target.TargetMethod;
             writer.WriteLine($"// 2. Create InvocationContext");
 
-            // 2.1. Pack Arguments
+            // 2.1. PBI 4.2: Retrieve MethodInfo
+            EmitMethodInfoRetrieval(writer, target);
+
+            // 2.2. Pack Arguments
             writer.WriteLine($"var __arguments = new {DictionaryType}<string, object?>()");
             writer.OpenBlock();
             foreach (var param in method.Parameters)
             {
+                // Use positional arguments for compatibility.
                 var paramNameLiteral = SymbolDisplay.FormatLiteral(param.Name, true);
                 writer.WriteLine($"{{ {paramNameLiteral}, {param.Name} }},");
             }
             writer.CloseBlock(suffix: ";");
 
-            // 2.2. Create Context
+            // 2.3. Create Context
             var typeName = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
 
             string methodNameLiteral = SymbolDisplay.FormatLiteral(method.Name, true);
@@ -96,7 +95,8 @@ namespace AspectWeaver.Generator.Emitters
             writer.Indent();
             writer.WriteLine($"targetInstance: {targetInstanceExpression},");
             writer.WriteLine($"serviceProvider: {ServiceProviderVar},");
-            // Use the robust literals
+            // PBI 4.2: Pass the retrieved MethodInfo
+            writer.WriteLine($"methodInfo: {MethodInfoVar},");
             writer.WriteLine($"methodName: {methodNameLiteral},");
             writer.WriteLine($"targetTypeName: {typeNameLiteral},");
             writer.WriteLine($"arguments: __arguments");
@@ -104,9 +104,82 @@ namespace AspectWeaver.Generator.Emitters
             writer.WriteLine(");");
             writer.WriteLine();
         }
+
+        // PBI 4.2: Helper to generate the MethodInfo retrieval logic using Type.GetMethod().
+        private static void EmitMethodInfoRetrieval(IndentedWriter writer, InterceptionTarget target)
+        {
+            writer.WriteLine("// PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).");
+
+            var method = target.TargetMethod;
+
+            // 1. Get the Type object of the containing type.
+            var containingTypeFQN = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
+            writer.WriteLine($"var __targetType = typeof({containingTypeFQN});");
+
+            // 2. Define the parameter types array for the specific overload.
+            writer.WriteLine("var __paramTypes = new global::System.Type[]");
+            writer.OpenBlock();
+            foreach (var p in method.Parameters)
+            {
+                var paramTypeFQN = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
+                // Handle ref/out parameters correctly for reflection lookup.
+                if (p.RefKind != RefKind.None)
+                {
+                    // typeof(T).MakeByRefType() is required for matching ref/out parameters.
+                    writer.WriteLine($"typeof({paramTypeFQN}).MakeByRefType(),");
+                }
+                else
+                {
+                    writer.WriteLine($"typeof({paramTypeFQN}),");
+                }
+            }
+            writer.CloseBlock(";");
+
+            // 3. Call GetMethod().
+            var methodNameLiteral = SymbolDisplay.FormatLiteral(method.Name, true);
+            // Define binding flags (Public/NonPublic, Instance/Static).
+            string bindingFlags = "global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | ";
+            bindingFlags += method.IsStatic ? "global::System.Reflection.BindingFlags.Static" : "global::System.Reflection.BindingFlags.Instance";
+
+            // Handle Generic Methods: If generic, we first get the generic definition, then specialize it.
+            if (method.IsGenericMethod)
+            {
+                // GetMethod on a generic type returns the Generic Method Definition when called with the correct parameter types.
+                writer.WriteLine($"var __genericMethodDefinition = __targetType.GetMethod({methodNameLiteral}, {bindingFlags}, null, __paramTypes, null);");
+
+                // Safety check for the definition.
+                var exceptionMsgDef = SymbolDisplay.FormatLiteral($"Could not resolve Generic Method Definition for {method.Name}. This indicates an issue in AspectWeaver.", true);
+                writer.WriteLine($"if (__genericMethodDefinition == null) throw new {InvalidOperationExceptionType}({exceptionMsgDef});");
+
+
+                // Generate the specialization types array (TypeArguments used at the call site).
+                writer.WriteLine("var __genericArgs = new global::System.Type[]");
+                writer.OpenBlock();
+                foreach (var typeArg in method.TypeArguments)
+                {
+                    var typeArgFQN = typeArg.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
+                    writer.WriteLine($"typeof({typeArgFQN}),");
+                }
+                writer.CloseBlock(";");
+
+                // Specialize the method.
+                writer.WriteLine($"var {MethodInfoVar} = __genericMethodDefinition.MakeGenericMethod(__genericArgs);");
+            }
+            else
+            {
+                // Non-generic method call.
+                writer.WriteLine($"var {MethodInfoVar} = __targetType.GetMethod({methodNameLiteral}, {bindingFlags}, null, __paramTypes, null);");
+
+                // Safety check (should not happen if generation is correct).
+                var exceptionMsg = SymbolDisplay.FormatLiteral($"Could not resolve MethodInfo for {method.Name}. This indicates an issue in AspectWeaver.", true);
+                writer.WriteLine($"if ({MethodInfoVar} == null) throw new {InvalidOperationExceptionType}({exceptionMsg});");
+            }
+        }
+
         #endregion
 
         #region Step 3: Core Delegate
+        // (Implementation remains the same as PBI 2.6)
         private static void EmitCoreDelegate(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string delegateType)
         {
             writer.WriteLine($"// 3. Core: The original method call.");
@@ -168,7 +241,7 @@ namespace AspectWeaver.Generator.Emitters
         }
         #endregion
 
-        #region Step 4: Aspect Chain
+        #region Step 4: Aspect Chain (Includes User Fix)
         private static void EmitAspectChain(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
         {
             writer.WriteLine("// 4. Wrapping: Apply aspects (from inner to outer).");
@@ -192,6 +265,8 @@ namespace AspectWeaver.Generator.Emitters
             writer.WriteLine($"var {nextVar} = {PipelineVar};");
 
             var handlerVar = $"__handler{index}";
+
+            // USER FIX APPLIED: Use nullable cast (?) to satisfy CS8600 in strict mode.
             writer.WriteLine($"var {handlerVar} = ({handlerInterfaceType}?){ServiceProviderVar}.GetService(typeof({handlerInterfaceType}));");
 
             // Use positional arguments for compatibility.
@@ -210,6 +285,7 @@ namespace AspectWeaver.Generator.Emitters
         }
 
         #region Attribute Rehydration
+        // (Implementation remains the same)
         private static void EmitAttributeRehydration(IndentedWriter writer, string varName, string attributeType, AttributeData attributeData)
         {
             var constructorArgs = string.Join(", ", attributeData.ConstructorArguments.Select(arg => TypedConstantToString(arg)));
@@ -266,6 +342,7 @@ namespace AspectWeaver.Generator.Emitters
         #endregion
 
         #region Step 5: Execution
+        // (Implementation remains the same as PBI 2.6)
         private static void EmitPipelineExecution(IndentedWriter writer, MethodSignature signature)
         {
             writer.WriteLine("// 5. Execute the pipeline.");

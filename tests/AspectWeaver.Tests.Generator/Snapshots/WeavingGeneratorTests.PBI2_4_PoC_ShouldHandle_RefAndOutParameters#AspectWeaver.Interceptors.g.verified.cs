@@ -19,6 +19,16 @@ namespace AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
+            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
+            var __targetType = typeof(global::TestApp.ComplexService);
+            var __paramTypes = new global::System.Type[]
+            {
+                typeof(string),
+                typeof(int).MakeByRefType(),
+                typeof(bool).MakeByRefType(),
+            };
+            var __methodInfo = __targetType.GetMethod("TryParse", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for TryParse. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
                 { "input", input },
@@ -28,6 +38,7 @@ namespace AspectWeaver.Generated
             var __context = new global::AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
+                methodInfo: __methodInfo,
                 methodName: "TryParse",
                 targetTypeName: "global::TestApp.ComplexService",
                 arguments: __arguments

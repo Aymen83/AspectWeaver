@@ -19,6 +19,19 @@ namespace AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
+            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
+            var __targetType = typeof(global::TestApp.AsyncGenericService);
+            var __paramTypes = new global::System.Type[]
+            {
+                typeof(string),
+            };
+            var __genericMethodDefinition = __targetType.GetMethod("FetchAsync", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__genericMethodDefinition == null) throw new global::System.InvalidOperationException("Could not resolve Generic Method Definition for FetchAsync. This indicates an issue in AspectWeaver.");
+            var __genericArgs = new global::System.Type[]
+            {
+                typeof(T),
+            };
+            var __methodInfo = __genericMethodDefinition.MakeGenericMethod(__genericArgs);
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
                 { "key", key },
@@ -26,6 +39,7 @@ namespace AspectWeaver.Generated
             var __context = new global::AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
+                methodInfo: __methodInfo,
                 methodName: "FetchAsync",
                 targetTypeName: "global::TestApp.AsyncGenericService",
                 arguments: __arguments

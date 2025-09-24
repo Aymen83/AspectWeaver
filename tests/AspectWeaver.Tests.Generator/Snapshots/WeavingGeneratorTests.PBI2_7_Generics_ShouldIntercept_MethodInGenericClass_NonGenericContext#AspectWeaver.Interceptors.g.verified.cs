@@ -19,6 +19,14 @@ namespace AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
+            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
+            var __targetType = typeof(global::TestApp.Repository<global::TestApp.User>);
+            var __paramTypes = new global::System.Type[]
+            {
+                typeof(int),
+            };
+            var __methodInfo = __targetType.GetMethod("GetById", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for GetById. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
                 { "id", id },
@@ -26,6 +34,7 @@ namespace AspectWeaver.Generated
             var __context = new global::AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
+                methodInfo: __methodInfo,
                 methodName: "GetById",
                 targetTypeName: "global::TestApp.Repository<global::TestApp.User>",
                 arguments: __arguments
