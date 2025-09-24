@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿// src/AspectWeaver.Generator/Analysis/TargetAnalyzer.cs
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -9,17 +10,17 @@ namespace AspectWeaver.Generator.Analysis
 {
     internal static class TargetAnalyzer
     {
+        // PBI 5.2 FIX: Define the conventional name for the default order constant.
+        private const string DefaultOrderFieldName = "DefaultOrder";
+
         /// <summary>
         /// Analyzes a method symbol to find all applicable AspectAttributes, considering inheritance and ensuring uniqueness.
         /// </summary>
         public static ImmutableArray<AspectInfo> FindApplicableAspects(IMethodSymbol methodSymbol, INamedTypeSymbol aspectBaseType)
         {
             var aspects = new List<AspectInfo>();
-            // Crucial: Keep track of attribute types already added to handle Inherited=true duplicates.
-            // If an aspect is applied on both base and derived types, it should only be included once.
             var addedAttributeTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
-            // Helper delegate to process attributes on a symbol
             void ProcessAttributes(ISymbol symbol)
             {
                 foreach (var attributeData in symbol.GetAttributes())
@@ -29,9 +30,9 @@ namespace AspectWeaver.Generator.Analysis
 
                     if (IsDerivedFrom(attributeClass, aspectBaseType))
                     {
-                        // Ensure uniqueness across the hierarchy.
                         if (addedAttributeTypes.Add(attributeClass))
                         {
+                            // Call the updated ExtractOrder method.
                             var order = ExtractOrder(attributeData);
                             aspects.Add(new AspectInfo(attributeData, order));
                         }
@@ -39,6 +40,7 @@ namespace AspectWeaver.Generator.Analysis
                 }
             }
 
+            // (Hierarchy traversal logic remains the same...)
             // 1. Check the method itself and its overrides (base classes).
             var currentMethod = methodSymbol;
             while (currentMethod != null)
@@ -49,29 +51,32 @@ namespace AspectWeaver.Generator.Analysis
 
             // 2. Check interface implementations.
             var containingType = methodSymbol.ContainingType;
-            foreach (var iface in containingType.AllInterfaces) // AllInterfaces includes inherited interfaces.
+            // Ensure containingType is not null before accessing AllInterfaces
+            if (containingType != null)
             {
-                foreach (var interfaceMethod in iface.GetMembers().OfType<IMethodSymbol>())
+                foreach (var iface in containingType.AllInterfaces)
                 {
-                    var implementation = containingType.FindImplementationForInterfaceMember(interfaceMethod);
-                    if (implementation == null) continue;
-
-                    // Check if the implementation found is the methodSymbol or one of its base overrides.
-                    bool isRelated = false;
-                    var temp = methodSymbol;
-                    while (temp != null)
+                    foreach (var interfaceMethod in iface.GetMembers().OfType<IMethodSymbol>())
                     {
-                        if (SymbolEqualityComparer.Default.Equals(temp, implementation))
+                        var implementation = containingType.FindImplementationForInterfaceMember(interfaceMethod);
+                        if (implementation == null) continue;
+
+                        bool isRelated = false;
+                        var temp = methodSymbol;
+                        while (temp != null)
                         {
-                            isRelated = true;
-                            break;
+                            if (SymbolEqualityComparer.Default.Equals(temp, implementation))
+                            {
+                                isRelated = true;
+                                break;
+                            }
+                            temp = temp.OverriddenMethod;
                         }
-                        temp = temp.OverriddenMethod;
-                    }
 
-                    if (isRelated)
-                    {
-                        ProcessAttributes(interfaceMethod);
+                        if (isRelated)
+                        {
+                            ProcessAttributes(interfaceMethod);
+                        }
                     }
                 }
             }
@@ -85,6 +90,7 @@ namespace AspectWeaver.Generator.Analysis
             return aspects.OrderBy(a => a.Order).ToImmutableArray();
         }
 
+        // (IsDerivedFrom remains the same)
         private static bool IsDerivedFrom(INamedTypeSymbol? type, INamedTypeSymbol baseType)
         {
             var current = type;
@@ -96,9 +102,10 @@ namespace AspectWeaver.Generator.Analysis
             return false;
         }
 
+        // PBI 5.2 FIX: Robustly extract the Order value.
         private static int ExtractOrder(AttributeData attributeData)
         {
-            // Find the 'Order' property assignment (e.g., [MyAspect(Order = 10)]).
+            // 1. Check Named Arguments (Explicit override at usage site: [MyAspect(Order = 5)])
             foreach (var namedArgument in attributeData.NamedArguments)
             {
                 if (namedArgument.Key == "Order" && namedArgument.Value.Value is int orderValue)
@@ -106,13 +113,32 @@ namespace AspectWeaver.Generator.Analysis
                     return orderValue;
                 }
             }
-            return 0; // Default order.
+
+            // 2. Check for DefaultOrder constant on the attribute class (Defined default).
+            // This works even if the attribute is in a referenced assembly (metadata).
+            var attributeClass = attributeData.AttributeClass;
+            if (attributeClass != null)
+            {
+                // Look for the constant field by the conventional name.
+                var defaultOrderField = attributeClass.GetMembers(DefaultOrderFieldName)
+                                                      .OfType<IFieldSymbol>()
+                                                      .FirstOrDefault();
+
+                // Ensure it exists, is constant, and has a value of type int.
+                if (defaultOrderField != null && defaultOrderField.IsConst && defaultOrderField.HasConstantValue)
+                {
+                    if (defaultOrderField.ConstantValue is int defaultOrderValue)
+                    {
+                        return defaultOrderValue;
+                    }
+                }
+            }
+
+            // 3. Fallback to absolute default if no explicit order or constant is defined.
+            return 0;
         }
 
-        /// <summary>
-        /// Calculates the precise location required for [InterceptsLocation].
-        /// It must point to the identifier (the method name) of the invocation.
-        /// </summary>
+        // (CalculateIdentifierLocation remains the same)
         public static InterceptionLocation CalculateIdentifierLocation(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
             // Determine the syntax node representing the identifier being called.
@@ -128,10 +154,8 @@ namespace AspectWeaver.Generator.Analysis
                 _ => invocation.Expression
             };
 
-            // Good practice to check for cancellation if the token is provided.
             cancellationToken.ThrowIfCancellationRequested();
 
-            // FIX: GetLineSpan() does not accept CancellationToken.
             var lineSpan = identifierNode.GetLocation().GetLineSpan();
             var position = lineSpan.StartLinePosition;
 

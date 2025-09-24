@@ -10,10 +10,15 @@ namespace AspectWeaver.Extensions.Validation
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public sealed class ValidateParametersAttribute : AspectAttribute
     {
+        /// <summary>
+        /// The default execution order for this aspect (-1000, ensuring early execution).
+        /// </summary>
+        public const int DefaultOrder = -1000;
+
         public ValidateParametersAttribute()
         {
-            // Set a low Order value to ensure validation occurs early in the pipeline (before logging, caching, etc.).
-            Order = -1000;
+            // Ensure runtime consistency with the compile-time constant.
+            Order = DefaultOrder;
         }
     }
 }

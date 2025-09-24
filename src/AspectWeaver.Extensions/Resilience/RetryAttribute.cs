@@ -23,11 +23,15 @@ namespace AspectWeaver.Extensions.Resilience
         /// </summary>
         public int DelayMilliseconds { get; set; } = 100;
 
+        /// <summary>
+        /// The default execution order for this aspect (1000, ensuring late execution/wrapping).
+        /// </summary>
+        public const int DefaultOrder = 1000;
+
         public RetryAttribute()
         {
-            // Set a high Order value to ensure retry logic wraps other aspects (like Logging or Validation).
-            // Example: Log(Retry(Operation)). Validation should happen before the retry loop starts.
-            Order = 1000;
+            // Ensure runtime consistency with the compile-time constant.
+            Order = DefaultOrder;
         }
     }
 }

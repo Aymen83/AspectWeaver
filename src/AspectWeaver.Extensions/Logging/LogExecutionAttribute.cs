@@ -13,6 +13,17 @@ namespace AspectWeaver.Extensions.Logging
     public sealed class LogExecutionAttribute : AspectAttribute
     {
         /// <summary>
+        /// The default execution order for this aspect (100).
+        /// </summary>
+        public const int DefaultOrder = 100;
+
+        public LogExecutionAttribute()
+        {
+            // Ensure runtime consistency with the compile-time constant.
+            Order = DefaultOrder;
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="LogLevel"/> used for standard execution messages (Start, End, Duration).
         /// Defaults to <see cref="LogLevel.Information"/>.
         /// </summary>
