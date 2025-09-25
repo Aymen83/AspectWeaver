@@ -1,5 +1,4 @@
 ﻿// src/AspectWeaver.Extensions/Validation/ValidateParametersAttribute.cs
-using System;
 using AspectWeaver.Abstractions;
 
 namespace AspectWeaver.Extensions.Validation

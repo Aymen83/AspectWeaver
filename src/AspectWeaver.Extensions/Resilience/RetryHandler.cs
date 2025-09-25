@@ -1,6 +1,4 @@
 ﻿// src/AspectWeaver.Extensions/Resilience/RetryHandler.cs
-using System;
-using System.Threading.Tasks;
 using AspectWeaver.Abstractions;
 
 namespace AspectWeaver.Extensions.Resilience

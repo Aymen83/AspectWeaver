@@ -1,14 +1,9 @@
 ﻿// tests/AspectWeaver.Tests.Generator/GeneratorTestHelper.cs
+using AspectWeaver.Abstractions;
+using AspectWeaver.Generator;
+using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using VerifyXunit;
-using AspectWeaver.Generator;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
-using Basic.Reference.Assemblies;
-using AspectWeaver.Abstractions;
 using System.Text;
 
 namespace AspectWeaver.Tests.Generator;

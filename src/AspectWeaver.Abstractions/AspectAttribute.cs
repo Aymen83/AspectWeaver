@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AspectWeaver.Abstractions
+﻿namespace AspectWeaver.Abstractions
 {
     /// <summary>
     /// The base class for all attributes that define an aspect.

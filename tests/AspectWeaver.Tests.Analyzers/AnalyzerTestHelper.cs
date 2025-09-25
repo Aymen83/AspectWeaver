@@ -6,8 +6,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AspectWeaver.Tests.Analyzers;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace AspectWeaver.Tests.Integration.Tracer;
+﻿namespace AspectWeaver.Tests.Integration.Tracer;
 
 public class TracerTargetService
 {

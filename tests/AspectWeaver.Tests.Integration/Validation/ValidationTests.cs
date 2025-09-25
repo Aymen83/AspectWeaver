@@ -1,7 +1,4 @@
-﻿using Xunit;
-using System.Threading.Tasks;
-using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace AspectWeaver.Tests.Integration.Validation;
 

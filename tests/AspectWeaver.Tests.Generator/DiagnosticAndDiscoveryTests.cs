@@ -1,8 +1,4 @@
-﻿using VerifyXunit;
-using Xunit;
-using System.Threading.Tasks;
-
-namespace AspectWeaver.Tests.Generator;
+﻿namespace AspectWeaver.Tests.Generator;
 
 public class DiagnosticAndDiscoveryTests
 {

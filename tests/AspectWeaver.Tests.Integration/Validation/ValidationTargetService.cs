@@ -1,6 +1,5 @@
-﻿using System;
+﻿using AspectWeaver.Abstractions.Constraints;
 using AspectWeaver.Extensions.Validation;
-using AspectWeaver.Abstractions.Constraints;
 
 namespace AspectWeaver.Tests.Integration.Validation;
 

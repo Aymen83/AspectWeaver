@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using AspectWeaver.Extensions.Logging;
+﻿using AspectWeaver.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace AspectWeaver.Tests.Integration.Logging;

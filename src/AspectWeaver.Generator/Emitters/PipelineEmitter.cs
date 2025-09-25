@@ -1,7 +1,6 @@
 ﻿// src/AspectWeaver.Generator/Emitters/PipelineEmitter.cs
 using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
-using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace AspectWeaver.Generator.Emitters

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace AspectWeaver.Abstractions
+﻿namespace AspectWeaver.Abstractions
 {
     /// <summary>
     /// Defines the interface for a handler that implements the logic of a specific aspect.

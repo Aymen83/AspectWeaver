@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using AspectWeaver.Extensions.Resilience;
+﻿using AspectWeaver.Extensions.Resilience;
 
 namespace AspectWeaver.Tests.Integration.Resilience;
 

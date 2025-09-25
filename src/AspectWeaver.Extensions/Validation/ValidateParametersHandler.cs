@@ -1,10 +1,7 @@
 ﻿// src/AspectWeaver.Extensions/Validation/ValidateParametersHandler.cs
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using AspectWeaver.Abstractions;
 using AspectWeaver.Abstractions.Constraints;
+using System.Reflection;
 
 namespace AspectWeaver.Extensions.Validation
 {

@@ -1,7 +1,4 @@
-﻿using Xunit;
-using System.Threading.Tasks;
-using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
 namespace AspectWeaver.Tests.Integration.Resilience;

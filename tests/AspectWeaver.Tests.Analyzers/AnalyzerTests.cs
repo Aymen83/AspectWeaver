@@ -1,9 +1,6 @@
 ﻿// tests/AspectWeaver.Tests.Analyzers/AnalyzerTests.cs
 using AspectWeaver.Generator.Analyzers;
 using AspectWeaver.Generator.Diagnostics;
-using Microsoft.CodeAnalysis;
-using System.Threading.Tasks;
-using Xunit;
 // FIX CS0618: Update the Verifier alias to use DefaultVerifier.
 using AspectVerifier = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<AspectWeaver.Generator.Analyzers.AspectTargetAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
 using RetryVerifier = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<AspectWeaver.Generator.Analyzers.RetryAttributeAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;

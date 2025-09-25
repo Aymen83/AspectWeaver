@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using AspectWeaver.Extensions; // Required for AddAspectWeaverHandlers
+﻿using AspectWeaver.Extensions; // Required for AddAspectWeaverHandlers
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspectWeaver.Tests.Integration;
 

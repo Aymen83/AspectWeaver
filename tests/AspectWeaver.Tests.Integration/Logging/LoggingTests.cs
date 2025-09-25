@@ -1,9 +1,6 @@
-﻿using Xunit;
-using Moq;
-using System.Threading.Tasks;
-using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace AspectWeaver.Tests.Integration.Logging;
 

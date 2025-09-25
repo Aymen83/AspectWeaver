@@ -1,9 +1,8 @@
 ﻿// src/AspectWeaver.Generator/Emitters/InterceptorEmitter.cs
 using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
-using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Collections.Immutable;
 
 namespace AspectWeaver.Generator.Emitters
 {

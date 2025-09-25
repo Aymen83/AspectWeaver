@@ -1,6 +1,4 @@
 ﻿using AspectWeaver.Abstractions;
-using System;
-using System.Threading.Tasks;
 
 namespace AspectWeaver.Tests.Integration.Tracer;
 

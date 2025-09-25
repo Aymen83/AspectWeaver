@@ -1,8 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using System.Threading.Tasks;
-using System;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AspectWeaver.Tests.Integration.Tracer;
 

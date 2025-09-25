@@ -1,5 +1,4 @@
 ﻿// src/AspectWeaver.Extensions/Logging/LogExecutionAttribute.cs
-using System;
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
 

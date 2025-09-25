@@ -1,14 +1,12 @@
 ﻿using AspectWeaver.Generator.Analysis;
+// Import Diagnostics namespace
+using AspectWeaver.Generator.Diagnostics;
 using AspectWeaver.Generator.Emitters;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
-using System.Threading;
-// Import Diagnostics namespace
-using AspectWeaver.Generator.Diagnostics;
 
 namespace AspectWeaver.Generator
 {

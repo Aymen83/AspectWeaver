@@ -1,9 +1,7 @@
 ﻿// src/AspectWeaver.Extensions/Logging/LogExecutionHandler.cs
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace AspectWeaver.Extensions.Logging
 {

@@ -1,8 +1,6 @@
 ﻿// src/AspectWeaver.Generator/Emitters/MethodSignature.cs
-using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
-using System.Linq;
 using AspectWeaver.Generator.Analysis;
+using Microsoft.CodeAnalysis;
 using System.Text;
 
 namespace AspectWeaver.Generator.Emitters

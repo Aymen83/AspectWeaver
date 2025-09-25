@@ -1,8 +1,4 @@
 ﻿// tests/AspectWeaver.Tests.Generator/WeavingGeneratorRobustnessTests.cs
-using VerifyXunit;
-using Xunit;
-using System.Threading.Tasks;
-
 namespace AspectWeaver.Tests.Generator;
 
 public class WeavingGeneratorRobustnessTests
