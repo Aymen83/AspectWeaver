@@ -2,15 +2,10 @@
 
 namespace AspectWeaver.Tests.Integration.Resilience;
 
-public class RetryTargetService
+public class RetryTargetService(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider (Epic 3 requirement).
-    internal IServiceProvider ServiceProvider { get; }
-
-    public RetryTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     // Tracks the number of times the method body has started execution.
     public int ExecutionCount { get; private set; }

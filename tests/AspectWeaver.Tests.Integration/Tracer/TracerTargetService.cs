@@ -1,15 +1,9 @@
 ﻿namespace AspectWeaver.Tests.Integration.Tracer;
 
-public class TracerTargetService
+public class TracerTargetService(IServiceProvider serviceProvider)
 {
     // CRITICAL: Expose IServiceProvider to enable DI integration (Epic 3 requirement, avoids AW001).
-    internal IServiceProvider ServiceProvider { get; }
-
-    // Inject the provider during construction. The DI container handles this automatically.
-    public TracerTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     [Tracer]
     public virtual int Calculate(int a, int b)

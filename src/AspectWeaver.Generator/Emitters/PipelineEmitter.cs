@@ -2,6 +2,7 @@
 using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Linq;
 
 namespace AspectWeaver.Generator.Emitters
 {

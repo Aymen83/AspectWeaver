@@ -42,7 +42,7 @@ namespace AspectWeaver.Generator.Diagnostics
              defaultSeverity: DiagnosticSeverity.Error,
              isEnabledByDefault: true,
              description: "AspectAttributes derived from AspectWeaver.Abstractions.AspectAttribute can only be applied to methods.",
-             customTags: new[] { WellKnownDiagnosticTags.CompilationEnd }
+             customTags: [WellKnownDiagnosticTags.CompilationEnd]
          );
 
         // PBI 5.5: New Diagnostics

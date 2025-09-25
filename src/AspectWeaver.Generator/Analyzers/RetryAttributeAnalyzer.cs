@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace AspectWeaver.Generator.Analyzers
 {
@@ -17,7 +18,7 @@ namespace AspectWeaver.Generator.Analyzers
         private const string RetryAttributeFullName = "AspectWeaver.Extensions.Resilience.RetryAttribute";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(DiagnosticDescriptors.AW005_InvalidAttributeConfiguration);
+            [DiagnosticDescriptors.AW005_InvalidAttributeConfiguration];
 
         public override void Initialize(AnalysisContext context)
         {
@@ -67,7 +68,7 @@ namespace AspectWeaver.Generator.Analyzers
                         descriptor: DiagnosticDescriptors.AW005_InvalidAttributeConfiguration,
                         location: location,
                         // Message arguments: Attribute Name, Reason.
-                        messageArgs: new object[] { attributeData.AttributeClass!.Name, "MaxAttempts must be greater than or equal to 1." }
+                        messageArgs: [attributeData.AttributeClass!.Name, "MaxAttempts must be greater than or equal to 1."]
                     );
                     context.ReportDiagnostic(diagnostic);
                 }

@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <IsPackable>true</IsPackable>
+    <PackageId>AspectWeaver.Extensions</PackageId>
+    <Description>Extensions and built-in aspects for AspectWeaver. Includes DI registration helpers and aspects for Logging, Validation, and Resilience (Retry).</Description>
+    <PackageTags>AOP, AspectWeaver, Logging, Validation, Retry, Resilience, Dependency Injection, DI</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

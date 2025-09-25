@@ -1,5 +1,7 @@
 ﻿// src/AspectWeaver.Generator/Emitters/IndentedWriter.cs
+using System;
 using System.CodeDom.Compiler;
+using System.IO;
 using System.Text;
 
 namespace AspectWeaver.Generator.Emitters

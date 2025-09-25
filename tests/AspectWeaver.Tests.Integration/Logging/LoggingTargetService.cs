@@ -3,15 +3,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AspectWeaver.Tests.Integration.Logging;
 
-public class LoggingTargetService
+public class LoggingTargetService(IServiceProvider serviceProvider)
 {
     // CRITICAL: Expose IServiceProvider (Epic 3 requirement).
-    internal IServiceProvider ServiceProvider { get; }
-
-    public LoggingTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     [LogExecution(Level = LogLevel.Information, LogArguments = true, LogReturnValue = true)]
     public virtual int SyncMethod(int input)

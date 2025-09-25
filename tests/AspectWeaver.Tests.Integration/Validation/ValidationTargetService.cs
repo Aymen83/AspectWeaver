@@ -3,15 +3,10 @@ using AspectWeaver.Extensions.Validation;
 
 namespace AspectWeaver.Tests.Integration.Validation;
 
-public class ValidationTargetService
+public class ValidationTargetService(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider (Epic 3 requirement).
-    internal IServiceProvider ServiceProvider { get; }
-
-    public ValidationTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     // Property used to verify if the method body executed.
     public bool WasExecuted { get; private set; }

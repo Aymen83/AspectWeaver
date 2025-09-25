@@ -15,7 +15,7 @@ namespace AspectWeaver.Generator.Analyzers
         private const string AspectAttributeFullName = "AspectWeaver.Abstractions.AspectAttribute";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(DiagnosticDescriptors.AW003_InvalidAspectTarget);
+            [DiagnosticDescriptors.AW003_InvalidAspectTarget];
 
         public override void Initialize(AnalysisContext context)
         {
@@ -88,7 +88,7 @@ namespace AspectWeaver.Generator.Analyzers
                         // Report the diagnostic at the location of the attribute usage.
                         location: attributeData.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken).GetLocation(),
                         // Message arguments: Attribute Name, Target Kind (e.g., Property, Field).
-                        messageArgs: new object[] { attributeClass.Name, member.Kind.ToString() }
+                        messageArgs: [attributeClass.Name, member.Kind.ToString()]
                     );
                     context.ReportDiagnostic(diagnostic);
                 }

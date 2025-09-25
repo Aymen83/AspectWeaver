@@ -1,4 +1,6 @@
-﻿namespace AspectWeaver.Abstractions.Constraints
+﻿using System;
+
+namespace AspectWeaver.Abstractions.Constraints
 {
     /// <summary>
     /// Specifies that the annotated parameter must not be null.

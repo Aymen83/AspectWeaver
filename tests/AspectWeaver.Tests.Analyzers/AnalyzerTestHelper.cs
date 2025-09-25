@@ -21,9 +21,9 @@ public class AnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, DefaultVeri
         ReferenceAssemblies = new ReferenceAssemblies(
             "net8.0",
             new PackageIdentity("Microsoft.NETCore.App.Ref", "8.0.0"),
-            System.IO.Path.Combine("ref", "net8.0"))
+            Path.Combine("ref", "net8.0"))
             // Use Basic.Reference.Assemblies for robustness.
-            .AddAssemblies(Net80.References.All.Select(r => r.FilePath!).ToImmutableArray());
+            .AddAssemblies([.. Net80.References.All.Select(r => r.FilePath!)]);
 
         // Add project-specific references (Abstractions and Extensions).
         TestState.AdditionalReferences.Add(typeof(AspectAttribute).Assembly);

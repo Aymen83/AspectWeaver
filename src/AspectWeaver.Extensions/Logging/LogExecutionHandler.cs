@@ -1,7 +1,9 @@
 ﻿// src/AspectWeaver.Extensions/Logging/LogExecutionHandler.cs
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace AspectWeaver.Extensions.Logging
 {
@@ -9,18 +11,13 @@ namespace AspectWeaver.Extensions.Logging
     /// Handler for <see cref="LogExecutionAttribute"/>.
     /// Resolves <see cref="ILoggerFactory"/> via DI and logs execution details.
     /// </summary>
-    public sealed class LogExecutionHandler : IAspectHandler<LogExecutionAttribute>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="LogExecutionHandler"/> class.
+    /// </remarks>
+    /// <param name="loggerFactory">The logger factory used to create loggers.</param>
+    public sealed class LogExecutionHandler(ILoggerFactory loggerFactory) : IAspectHandler<LogExecutionAttribute>
     {
-        private readonly ILoggerFactory _loggerFactory;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogExecutionHandler"/> class.
-        /// </summary>
-        /// <param name="loggerFactory">The logger factory used to create loggers.</param>
-        public LogExecutionHandler(ILoggerFactory loggerFactory)
-        {
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-        }
+        private readonly ILoggerFactory _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
 
         /// <inheritdoc />
         public async ValueTask<TResult> InterceptAsync<TResult>(LogExecutionAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)

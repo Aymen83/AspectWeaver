@@ -33,7 +33,7 @@ public static class GeneratorTestHelper
         // (Generator instantiation and driver creation remains the same...)
         var generator = new WeavingGenerator().AsSourceGenerator();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            generators: new[] { generator },
+            generators: [generator],
             parseOptions: ParseOptions);
 
         // 5. Run the generator.
@@ -58,7 +58,7 @@ public static class GeneratorTestHelper
 
             // Ensure no unexpected errors occurred.
             var unexpectedErrors = allDiagnostics.Where(d => d.Severity == DiagnosticSeverity.Error && !expectedDiagnosticIds.Contains(d.Id)).ToList();
-            if (unexpectedErrors.Any())
+            if (unexpectedErrors.Count != 0)
             {
                 throw new InvalidOperationException("Generator produced unexpected errors:\n" + string.Join("\n", unexpectedErrors));
             }
@@ -89,7 +89,7 @@ public static class GeneratorTestHelper
         builder.Replace(escapedFilePathLiteral, "\"[ScrubbedPath]\"");
     }
 
-    private static Compilation CreateCompilation(string source)
+    private static CSharpCompilation CreateCompilation(string source)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(source, ParseOptions, path: MockFilePath);
 
@@ -98,15 +98,17 @@ public static class GeneratorTestHelper
 
         return CSharpCompilation.Create(
             assemblyName: "AspectWeaver.Tests.Simulation",
-            syntaxTrees: new[] { syntaxTree },
+            syntaxTrees: [syntaxTree],
             references: References,
             options: options);
     }
 
-    private static IEnumerable<MetadataReference> LoadReferences()
+    private static List<MetadataReference> LoadReferences()
     {
-        var references = new List<MetadataReference>(Net80.References.All);
-        references.Add(MetadataReference.CreateFromFile(typeof(AspectAttribute).Assembly.Location));
+        var references = new List<MetadataReference>(Net80.References.All)
+        {
+            MetadataReference.CreateFromFile(typeof(AspectAttribute).Assembly.Location)
+        };
         return references;
     }
 }

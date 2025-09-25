@@ -1,6 +1,8 @@
 ﻿// Necessary usings because ImplicitUsings is disabled for .NET Standard 2.0.
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 using System.Reflection;
 
 namespace AspectWeaver.Extensions

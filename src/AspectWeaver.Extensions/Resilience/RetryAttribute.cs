@@ -1,5 +1,6 @@
 ﻿// src/AspectWeaver.Extensions/Resilience/RetryAttribute.cs
 using AspectWeaver.Abstractions;
+using System;
 
 namespace AspectWeaver.Extensions.Resilience
 {

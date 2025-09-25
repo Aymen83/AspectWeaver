@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 using System.Text;
+using System.Threading;
 
 namespace AspectWeaver.Generator
 {
@@ -149,7 +150,7 @@ namespace AspectWeaver.Generator
                         descriptor: DiagnosticDescriptors.AW006_RefStructNotSupported,
                         location: diagnosticLocation,
                         // Message arguments: Method Name, Parameter Name.
-                        messageArgs: new object[] { methodSymbol.Name, parameter.Name }
+                        messageArgs: [methodSymbol.Name, parameter.Name]
                     );
                     return (null, diagnostic);
                 }
@@ -165,7 +166,7 @@ namespace AspectWeaver.Generator
                     var diagnostic = Diagnostic.Create(
                        descriptor: DiagnosticDescriptors.AW004_UninterceptableCallPattern,
                        location: diagnosticLocation,
-                       messageArgs: new object[] { methodSymbol.Name }
+                       messageArgs: [methodSymbol.Name]
                    );
                     // Return the diagnostic (Warning) and null target.
                     return (null, diagnostic);
@@ -183,7 +184,7 @@ namespace AspectWeaver.Generator
                 var diagnostic = Diagnostic.Create(
                    descriptor: DiagnosticDescriptors.AW002_StaticMethodNotSupported,
                    location: diagnosticLocation,
-                   messageArgs: new object[] { methodSymbol.Name }
+                   messageArgs: [methodSymbol.Name]
                );
                 return (null, diagnostic);
             }
@@ -198,7 +199,7 @@ namespace AspectWeaver.Generator
                 var diagnostic = Diagnostic.Create(
                     descriptor: DiagnosticDescriptors.AW001_ServiceProviderNotFound,
                     location: diagnosticLocation,
-                    messageArgs: new object[] { methodSymbol.Name, methodSymbol.ContainingType.Name }
+                    messageArgs: [methodSymbol.Name, methodSymbol.ContainingType.Name]
                 );
                 return (null, diagnostic);
             }

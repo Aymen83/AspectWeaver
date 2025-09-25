@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <IsRoslynComponent>true</IsRoslynComponent>
+    
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsPackable>true</IsPackable>
+    <PackageId>AspectWeaver</PackageId>
+    <Description>The core AspectWeaver AOP framework engine. A high-performance source generator utilizing C# 12 Interceptors to weave aspects into your .NET applications.</Description>
+    <PackageTags>AOP, AspectWeaver, Interception, Source Generator, Analyzer, Roslyn, CSharp12</PackageTags>
+
+    
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
@@ -20,7 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspectWeaver.Abstractions\AspectWeaver.Abstractions.csproj" />
+    <ProjectReference Include="..\AspectWeaver.Abstractions\AspectWeaver.Abstractions.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\AspectWeaver.Abstractions\bin\Release\netstandard2.0\AspectWeaver.Abstractions.dll" Pack="true" PackagePath="lib/netstandard2.0" />
+    <Content Include="build\**" Pack="true" PackagePath="build" />
+    <Content Include="bin\Release\netstandard2.0\AspectWeaver.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
   <ItemGroup>

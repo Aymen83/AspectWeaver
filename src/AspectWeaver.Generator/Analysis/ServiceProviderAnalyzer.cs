@@ -1,5 +1,6 @@
 ﻿using AspectWeaver.Generator.Emitters; // Required for MethodSignature.InstanceParameterName
 using Microsoft.CodeAnalysis;
+using System.Linq;
 
 namespace AspectWeaver.Generator.Analysis
 {

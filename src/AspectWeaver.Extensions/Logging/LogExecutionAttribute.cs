@@ -1,6 +1,7 @@
 ﻿// src/AspectWeaver.Extensions/Logging/LogExecutionAttribute.cs
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace AspectWeaver.Extensions.Logging
 {

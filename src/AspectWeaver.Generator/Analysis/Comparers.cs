@@ -1,5 +1,7 @@
 ﻿// src/AspectWeaver.Generator/Analysis/Comparers.cs
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AspectWeaver.Generator.Analysis
 {

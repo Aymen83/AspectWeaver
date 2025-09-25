@@ -27,6 +27,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspectWeaver.Tests.Generato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspectWeaver.Tests.Analyzers", "tests\AspectWeaver.Tests.Analyzers\AspectWeaver.Tests.Analyzers.csproj", "{084BA229-0DCA-40F6-92D6-0FFD35E0449D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{2BE951B1-5DA2-4599-BCFD-BD3F9FC3FED9}"
+	ProjectSection(SolutionItems) = preProject
+		build-and-test.yml = build-and-test.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +127,7 @@ Global
 		{4BA3A12C-C74B-4499-AC9D-6D2896DECC6C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{201E9DF6-FD77-4770-BA85-2AE982BBC7CE} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{084BA229-0DCA-40F6-92D6-0FFD35E0449D} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{2BE951B1-5DA2-4599-BCFD-BD3F9FC3FED9} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1D6CC4F-9DE0-4635-9762-4017CC15BFC3}

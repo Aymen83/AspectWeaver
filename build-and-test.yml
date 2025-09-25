@@ -1,0 +1,35 @@
+name: Build and Test
+
+on:
+  # Trigger on pushes to the main branch
+  push:
+    branches: [ main ]
+  # Trigger on pull requests targeting the main branch
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    # Use the latest Ubuntu environment
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      # Use --force to ensure clean restore in CI environment
+      run: dotnet restore --force
+
+    - name: Build solution (Release configuration)
+      # Build the entire solution
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run all tests
+      # Run all test projects in the solution
+      run: dotnet test --configuration Release --no-build --verbosity normal

@@ -1,6 +1,8 @@
 ﻿// src/AspectWeaver.Generator/Emitters/MethodSignature.cs
 using AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace AspectWeaver.Generator.Emitters
@@ -9,7 +11,7 @@ namespace AspectWeaver.Generator.Emitters
     {
         // Base Format (Stabilized previously)
         // This format is used for Types (return types, parameters, AND constraint types).
-        private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(
+        private static readonly SymbolDisplayFormat Format = new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
             genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters | SymbolDisplayGenericsOptions.IncludeVariance,

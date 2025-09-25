@@ -7,15 +7,9 @@ namespace AspectWeaver.Tests.Integration.Tracer;
 public class TracerAttribute : AspectAttribute { }
 
 // 2. Define the Handler (This will be registered by IntegrationTestBase via assembly scanning)
-public class TracerHandler : IAspectHandler<TracerAttribute>
+public class TracerHandler(ITracerMock mock) : IAspectHandler<TracerAttribute>
 {
-    private readonly ITracerMock _mock;
-
-    // Inject the mock via DI (Validates Epic 3 implementation)
-    public TracerHandler(ITracerMock mock)
-    {
-        _mock = mock;
-    }
+    private readonly ITracerMock _mock = mock;
 
     public async ValueTask<TResult> InterceptAsync<TResult>(TracerAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
     {

@@ -1,7 +1,10 @@
 ﻿// src/AspectWeaver.Generator/Analysis/TargetAnalyzer.cs
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
 
 namespace AspectWeaver.Generator.Analysis
 {
@@ -80,11 +83,11 @@ namespace AspectWeaver.Generator.Analysis
 
             if (aspects.Count == 0)
             {
-                return ImmutableArray<AspectInfo>.Empty;
+                return [];
             }
 
             // Sort the aspects based on the Order property (ascending).
-            return aspects.OrderBy(a => a.Order).ToImmutableArray();
+            return [.. aspects.OrderBy(a => a.Order)];
         }
 
         // (IsDerivedFrom remains the same)
