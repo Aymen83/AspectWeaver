@@ -32,7 +32,6 @@ namespace AspectWeaver.Extensions
             var openGenericInterface = typeof(IAspectHandler<>);
 
             // Scan the assembly for potential handler types.
-            // We use a LINQ query for concise implementation.
             var typesToRegister = assembly.GetTypes()
                 // We are looking for public, concrete classes.
                 .Where(t => t.IsClass && !t.IsAbstract && t.IsPublic)
@@ -67,6 +66,9 @@ namespace AspectWeaver.Extensions
         /// and registers them with the specified <see cref="ServiceLifetime"/>.
         /// </summary>
         /// <typeparam name="TMarker">A type located in the assembly to scan (e.g., the Startup or Program class).</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="lifetime">The lifecycle for the registered handlers (default is Scoped).</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
         public static IServiceCollection AddAspectWeaverHandlers<TMarker>(
             this IServiceCollection services,
             ServiceLifetime lifetime = ServiceLifetime.Scoped)

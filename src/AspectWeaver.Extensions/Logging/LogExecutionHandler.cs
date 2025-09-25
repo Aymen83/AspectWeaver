@@ -1,5 +1,6 @@
-﻿using System;
-using System.Diagnostics; // Required for Stopwatch
+﻿// src/AspectWeaver.Extensions/Logging/LogExecutionHandler.cs
+using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -8,17 +9,22 @@ namespace AspectWeaver.Extensions.Logging
 {
     /// <summary>
     /// Handler for <see cref="LogExecutionAttribute"/>.
+    /// Resolves <see cref="ILoggerFactory"/> via DI and logs execution details.
     /// </summary>
     public sealed class LogExecutionHandler : IAspectHandler<LogExecutionAttribute>
     {
         private readonly ILoggerFactory _loggerFactory;
 
-        // Inject ILoggerFactory via DI.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogExecutionHandler"/> class.
+        /// </summary>
+        /// <param name="loggerFactory">The logger factory used to create loggers.</param>
         public LogExecutionHandler(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
+        /// <inheritdoc />
         public async ValueTask<TResult> InterceptAsync<TResult>(LogExecutionAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
         {
             // Create a logger specific to the target type.
@@ -64,11 +70,11 @@ namespace AspectWeaver.Extensions.Logging
             }
         }
 
+        // (Private helper methods LogEntry, LogExit, LogException remain the same - they do not require XML docs)
         private static void LogEntry(ILogger logger, LogExecutionAttribute attribute, InvocationContext context)
         {
             if (attribute.LogArguments)
             {
-                // Use structured logging for arguments ({@Arguments} serializes the object).
                 logger.Log(
                     attribute.Level,
                     "Executing method {MethodName} with arguments {@Arguments}",
@@ -86,7 +92,6 @@ namespace AspectWeaver.Extensions.Logging
 
         private static void LogExit(ILogger logger, LogExecutionAttribute attribute, InvocationContext context, TimeSpan duration, object? result)
         {
-            // We use TotalMilliseconds for higher precision logging.
             var durationMs = duration.TotalMilliseconds;
 
             if (attribute.LogReturnValue)
@@ -112,7 +117,6 @@ namespace AspectWeaver.Extensions.Logging
         {
             var durationMs = duration.TotalMilliseconds;
 
-            // Use the configured ExceptionLevel and pass the exception object.
             logger.Log(
                attribute.ExceptionLevel,
                ex,

@@ -1,4 +1,5 @@
-﻿using System;
+﻿// src/AspectWeaver.Extensions/Resilience/RetryHandler.cs
+using System;
 using System.Threading.Tasks;
 using AspectWeaver.Abstractions;
 
@@ -6,11 +7,13 @@ namespace AspectWeaver.Extensions.Resilience
 {
     /// <summary>
     /// Handler for <see cref="RetryAttribute"/>.
+    /// Implements a fixed-delay retry policy.
     /// </summary>
     public sealed class RetryHandler : IAspectHandler<RetryAttribute>
     {
         // This handler does not require DI for its core logic.
 
+        /// <inheritdoc />
         public async ValueTask<TResult> InterceptAsync<TResult>(RetryAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
         {
             // Validate configuration defensively.

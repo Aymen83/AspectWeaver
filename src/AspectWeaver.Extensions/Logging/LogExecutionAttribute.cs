@@ -1,4 +1,4 @@
-﻿// Necessary usings because ImplicitUsings is disabled for .NET Standard 2.0.
+﻿// src/AspectWeaver.Extensions/Logging/LogExecutionAttribute.cs
 using System;
 using AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -17,6 +17,9 @@ namespace AspectWeaver.Extensions.Logging
         /// </summary>
         public const int DefaultOrder = 100;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogExecutionAttribute"/> class.
+        /// </summary>
         public LogExecutionAttribute()
         {
             // Ensure runtime consistency with the compile-time constant.

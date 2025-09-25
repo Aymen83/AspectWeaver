@@ -1,4 +1,5 @@
-﻿using System;
+﻿// src/AspectWeaver.Extensions/Validation/ValidateParametersAttribute.cs
+using System;
 using AspectWeaver.Abstractions;
 
 namespace AspectWeaver.Extensions.Validation
@@ -15,6 +16,9 @@ namespace AspectWeaver.Extensions.Validation
         /// </summary>
         public const int DefaultOrder = -1000;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidateParametersAttribute"/> class.
+        /// </summary>
         public ValidateParametersAttribute()
         {
             // Ensure runtime consistency with the compile-time constant.

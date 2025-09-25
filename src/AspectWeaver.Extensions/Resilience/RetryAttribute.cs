@@ -1,4 +1,4 @@
-﻿// Necessary usings because ImplicitUsings is disabled for .NET Standard 2.0.
+﻿// src/AspectWeaver.Extensions/Resilience/RetryAttribute.cs
 using System;
 using AspectWeaver.Abstractions;
 
@@ -12,6 +12,20 @@ namespace AspectWeaver.Extensions.Resilience
     public sealed class RetryAttribute : AspectAttribute
     {
         /// <summary>
+        /// The default execution order for this aspect (1000, ensuring late execution/wrapping).
+        /// </summary>
+        public const int DefaultOrder = 1000;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryAttribute"/> class.
+        /// </summary>
+        public RetryAttribute()
+        {
+            // Ensure runtime consistency with the compile-time constant.
+            Order = DefaultOrder;
+        }
+
+        /// <summary>
         /// Gets or sets the maximum number of attempts (including the initial call).
         /// Must be greater than or equal to 1. Defaults to 3.
         /// </summary>
@@ -22,16 +36,5 @@ namespace AspectWeaver.Extensions.Resilience
         /// Defaults to 100ms.
         /// </summary>
         public int DelayMilliseconds { get; set; } = 100;
-
-        /// <summary>
-        /// The default execution order for this aspect (1000, ensuring late execution/wrapping).
-        /// </summary>
-        public const int DefaultOrder = 1000;
-
-        public RetryAttribute()
-        {
-            // Ensure runtime consistency with the compile-time constant.
-            Order = DefaultOrder;
-        }
     }
 }
