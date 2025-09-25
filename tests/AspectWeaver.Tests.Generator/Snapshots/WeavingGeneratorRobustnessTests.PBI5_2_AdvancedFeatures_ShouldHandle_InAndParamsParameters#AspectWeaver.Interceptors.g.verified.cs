@@ -5,10 +5,17 @@
 
 #nullable enable
 
+// Suppress warnings for generated code.
+#pragma warning disable CS1591
+#pragma warning disable RS0016
+
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace AspectWeaver.Generated
 {
+    [global::System.Diagnostics.DebuggerStepThrough]
+    [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
         [InterceptsLocation("[ScrubbedPath]", 50, 34)]

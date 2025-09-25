@@ -9,7 +9,6 @@ namespace AspectWeaver.Generator.Emitters
 {
     internal static class InterceptorEmitter
     {
-        // ... (Constants and Emit method remain the same)
         private const string GeneratedNamespace = "AspectWeaver.Generated";
         private const string GeneratedClassName = "Interceptors";
 
@@ -27,11 +26,15 @@ namespace AspectWeaver.Generator.Emitters
 
             // System.Runtime.CompilerServices is required for [InterceptsLocation] and [MethodImpl].
             writer.WriteLine("using System.Runtime.CompilerServices;");
+            // PBI 5.3: System.Diagnostics is required for Debugger attributes.
+            writer.WriteLine("using System.Diagnostics;");
             writer.WriteLine();
 
             writer.WriteLine($"namespace {GeneratedNamespace}");
             writer.OpenBlock();
 
+            // PBI 5.3: Apply Debugger attributes to the class.
+            EmitDebuggerAttributes(writer);
             writer.WriteLine($"internal static class {GeneratedClassName}");
             writer.OpenBlock();
 
@@ -51,15 +54,25 @@ namespace AspectWeaver.Generator.Emitters
             return writer.ToString();
         }
 
+        // PBI 5.3: New helper method for debugger attributes.
+        private static void EmitDebuggerAttributes(IndentedWriter writer)
+        {
+            // Instruct the debugger to step over this generated infrastructure code.
+            // We use FQNs for robustness.
+            writer.WriteLine("[global::System.Diagnostics.DebuggerStepThrough]");
+            writer.WriteLine("[global::System.Diagnostics.DebuggerNonUserCode]");
+        }
+
 
         private static void EmitInterceptorMethod(IndentedWriter writer, InterceptionTarget target, string interceptorName)
         {
+            // (Implementation remains the same as PBI 5.1)
             var signature = new MethodSignature(target.TargetMethod);
 
             // 1. Emit [InterceptsLocation] attribute
             EmitInterceptsLocationAttribute(writer, target.Location);
 
-            // PBI 5.1: 2. Emit Performance Optimization Attribute
+            // 2. Emit Performance Optimization Attribute
             EmitPerformanceAttributes(writer);
 
             // 3. Emit the method signature
@@ -84,16 +97,13 @@ namespace AspectWeaver.Generator.Emitters
         private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
         {
             // (Implementation remains the same)
-            // Signature: FormatLiteral(string value, bool quote)
             string filePathLiteral = SymbolDisplay.FormatLiteral(location.FilePath, true);
             writer.WriteLine($"[InterceptsLocation({filePathLiteral}, {location.Line}, {location.Character})]");
         }
 
-        // PBI 5.1: New helper method for performance attributes.
         private static void EmitPerformanceAttributes(IndentedWriter writer)
         {
-            // Encourage the JIT compiler to inline the interceptor method.
-            // We use the fully qualified name (FQN) for maximum robustness.
+            // (Implementation remains the same)
             writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
         }
     }
