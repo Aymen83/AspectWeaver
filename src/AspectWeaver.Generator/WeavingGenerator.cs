@@ -112,13 +112,13 @@ namespace AspectWeaver.Generator
         }
 
         /// <summary>
-        /// Semantic analysis (transform). Updated to return both the target and potential diagnostics.
+        /// Semantic analysis (transform). Updated to include limitation checks (PBI 5.5).
         /// </summary>
         private static (InterceptionTarget? Target, Diagnostic? Diagnostic) AnalyzeInvocation(
             InvocationExpressionSyntax invocation,
             INamedTypeSymbol aspectBaseSymbol,
             INamedTypeSymbol? serviceProviderSymbol,
-            Compilation compilation, // Required for accessibility checks
+            Compilation compilation,
             CancellationToken token,
             SemanticModel semanticModel)
         {
@@ -138,12 +138,48 @@ namespace AspectWeaver.Generator
                 return (null, null);
             }
 
-            // 3. PBI 3.2: Analyze IServiceProvider availability.
-
             // Get the precise Location object for diagnostic reporting.
             var diagnosticLocation = GetIdentifierLocation(invocation);
 
-            // 3.1 Handle Static Method Diagnostic (AW002).
+            // 3. PBI 5.5: Check for Architectural Limitations (Ref Structs - AW006).
+            foreach (var parameter in methodSymbol.Parameters)
+            {
+                // IsRefLikeType is the Roslyn property indicating a 'ref struct' (e.g., Span<T>).
+                if (parameter.Type.IsRefLikeType)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        descriptor: DiagnosticDescriptors.AW006_RefStructNotSupported,
+                        location: diagnosticLocation,
+                        // Message arguments: Method Name, Parameter Name.
+                        messageArgs: new object[] { methodSymbol.Name, parameter.Name }
+                    );
+                    return (null, diagnostic);
+                }
+            }
+
+            // 4. PBI 5.5: Check for Language Limitations (base. access - AW004).
+            // Analyze the syntax of the invocation expression.
+            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                // Check if the expression used to access the member is 'base'.
+                if (memberAccess.Expression is BaseExpressionSyntax)
+                {
+                    var diagnostic = Diagnostic.Create(
+                       descriptor: DiagnosticDescriptors.AW004_UninterceptableCallPattern,
+                       location: diagnosticLocation,
+                       messageArgs: new object[] { methodSymbol.Name }
+                   );
+                    // Return the diagnostic (Warning) and null target.
+                    return (null, diagnostic);
+                }
+            }
+            // Note: Detecting local 'this.' calls robustly is complex and often depends on the specific C# compiler version's implementation of Interceptors.
+            // We focus on the definitive limitation ('base.') for the MVP.
+
+
+            // 5. Analyze IServiceProvider availability (PBI 3.2 logic).
+
+            // 5.1 Handle Static Method Diagnostic (AW002).
             if (methodSymbol.IsStatic)
             {
                 var diagnostic = Diagnostic.Create(
@@ -155,27 +191,22 @@ namespace AspectWeaver.Generator
             }
 
 
-            // 3.2 Discover Provider Access Expression.
-            // Pass the compilation object for robust accessibility checks.
+            // 5.2 Discover Provider Access Expression.
             var providerAccessExpression = ServiceProviderAnalyzer.FindServiceProviderAccess(methodSymbol, serviceProviderSymbol, compilation);
 
-            // 3.3 Handle Not Found Diagnostic (AW001).
+            // 5.3 Handle Not Found Diagnostic (AW001).
             if (providerAccessExpression == null)
             {
                 var diagnostic = Diagnostic.Create(
                     descriptor: DiagnosticDescriptors.AW001_ServiceProviderNotFound,
                     location: diagnosticLocation,
-                    // Message arguments: Method Name, Containing Type Name.
                     messageArgs: new object[] { methodSymbol.Name, methodSymbol.ContainingType.Name }
                 );
-                // Return the diagnostic and null target (abort generation for this site).
                 return (null, diagnostic);
             }
 
-            // 4. Calculate the precise location for the interceptor attribute.
+            // 6. Success: Calculate location and create the target.
             var locationInfo = TargetAnalyzer.CalculateIdentifierLocation(invocation, token);
-
-            // 5. Success: Create the valid InterceptionTarget.
             var target = new InterceptionTarget(methodSymbol, locationInfo, appliedAspects, providerAccessExpression);
             return (target, null);
         }

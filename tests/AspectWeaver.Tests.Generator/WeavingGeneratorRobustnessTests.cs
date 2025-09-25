@@ -277,4 +277,90 @@ public class WeavingGeneratorRobustnessTests
 
         return VerifyRobustness(input);
     }
+
+    // PBI 5.5 Tests (Limitations)
+
+    [Fact]
+    public Task PBI5_5_AW006_ShouldEmitError_WhenRefStructParameterUsed()
+    {
+        // Scenario: Method uses Span<T> (a ref struct) and has an aspect.
+        // Expectation: AW006 is emitted, generation is aborted for this target.
+        var input = """
+            namespace TestApp
+            {
+                public class SpanService
+                {
+            """ + InfrastructureSetupInternal + """
+
+                    [AspectAAttribute]
+                    // Method using Span<byte>
+                    public virtual int ProcessBuffer(Span<byte> buffer)
+                    {
+                        return buffer.Length;
+                    }
+                }
+
+                public class Program
+                {
+                    public static void Main()
+                    {
+                        var service = new SpanService();
+                        Span<byte> data = stackalloc byte[10];
+                        // Call site triggering AW006
+                        service.ProcessBuffer(data);
+                    }
+                }
+            }
+            """;
+
+        return VerifyRobustness(input, "AW006");
+    }
+
+    [Fact]
+    public Task PBI5_5_AW004_ShouldEmitWarning_WhenBaseCallUsed()
+    {
+        // Scenario: Calling a method using 'base.' access.
+        // Expectation: AW004 (Warning) is emitted, generation is aborted for this specific call site.
+        var input = """
+            namespace TestApp
+            {
+                public class BaseService
+                {
+            """ + InfrastructureSetupInternal + """
+
+                    [AspectAAttribute]
+                    public virtual void Execute() { }
+                }
+
+                public class DerivedService : BaseService
+                {
+                    public override void Execute()
+                    {
+                        // Call site 1: Standard call (Interceptable)
+                        this.Helper();
+
+                        // Call site 2: 'base.' call (Uninterceptable - AW004)
+                        base.Execute();
+                    }
+
+                    [AspectBAttribute]
+                    public virtual void Helper() { }
+                }
+
+                public class Program
+                {
+                    public static void Main()
+                    {
+                        var service = new DerivedService();
+                        // Call site 3: External call (Interceptable)
+                        service.Execute();
+                    }
+                }
+            }
+            """;
+
+        // We expect AW004 for the 'base.Execute()' call site.
+        // The other call sites (Helper and external Execute) should still be intercepted.
+        return VerifyRobustness(input, "AW004");
+    }
 }
