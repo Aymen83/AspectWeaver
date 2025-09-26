@@ -1,10 +1,10 @@
-# AspectWeaver
+# Aymen83.AspectWeaver
 
-[![Build and Test](https://github.com/YOUR_GITHUB_USERNAME/AspectWeaver/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/AspectWeaver/actions/workflows/build-and-test.yml)
-[![NuGet Version (AspectWeaver)](https://img.shields.io/nuget/v/AspectWeaver.svg?label=AspectWeaver)](https://www.nuget.org/packages/AspectWeaver/)
-[![NuGet Version (AspectWeaver.Extensions)](https://img.shields.io/nuget/v/AspectWeaver.Extensions.svg?label=AspectWeaver.Extensions)](https://www.nuget.org/packages/AspectWeaver.Extensions/)
+[![Build and Test](https://github.com/Aymen83/AspectWeaver/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/Aymen83/AspectWeaver/actions/workflows/build-and-test.yml)
+[![NuGet Version (Aymen83.AspectWeaver)](https://img.shields.io/nuget/v/AspectWeaver.svg?label=AspectWeaver)](https://www.nuget.org/packages/AspectWeaver/)
+[![NuGet Version (Aymen83.AspectWeaver.Extensions)](https://img.shields.io/nuget/v/AspectWeaver.Extensions.svg?label=AspectWeaver.Extensions)](https://www.nuget.org/packages/AspectWeaver.Extensions/)
 
-AspectWeaver is a modern, high-performance Aspect-Oriented Programming (AOP) framework for .NET, leveraging the power of C# 12 Source Generators and Interceptors. It enables developers to implement cross-cutting concerns (like logging, validation, and resilience) cleanly without polluting the business logic.
+Aymen83.AspectWeaver is a modern, high-performance Aspect-Oriented Programming (AOP) framework for .NET, leveraging the power of C# 12 Source Generators and Interceptors. It enables developers to implement cross-cutting concerns (like logging, validation, and resilience) cleanly without polluting the business logic.
 
 ## Key Features
 
@@ -23,16 +23,16 @@ AspectWeaver is a modern, high-performance Aspect-Oriented Programming (AOP) fra
 
 ## Installation
 
-Install the core AspectWeaver package (which includes the generator and abstractions) and the Extensions package (for built-in aspects and DI helpers).
+Install the core Aymen83.AspectWeaver package (which includes the generator and abstractions) and the Extensions package (for built-in aspects and DI helpers).
 
 ```bash
-dotnet add package AspectWeaver
-dotnet add package AspectWeaver.Extensions
+dotnet add package Aymen83.AspectWeaver
+dotnet add package Aymen83.AspectWeaver.Extensions
 ```
 
 ### Important Configuration Note (C# 12 Interceptors)
 
-AspectWeaver relies on C# 12 Interceptors. The configuration required depends on the SDK you are using to compile the project:
+Aymen83.AspectWeaver relies on C# 12 Interceptors. The configuration required depends on the SDK you are using to compile the project:
 
 #### Compiling with .NET 8 SDK (e.g., Visual Studio 2022)
 
@@ -55,7 +55,7 @@ If you are compiling using the .NET 9 SDK or later, the `<Features>InterceptorsP
 Create an attribute deriving from `AspectAttribute` and a corresponding handler implementing `IAspectHandler<T>`.
 
 ```csharp
-using AspectWeaver.Abstractions;
+using Aymen83.AspectWeaver.Abstractions;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -89,10 +89,10 @@ public class SimpleLogHandler : IAspectHandler<SimpleLogAttribute>
 
 ### 2. Register Handlers (DI)
 
-Use the extension methods provided by `AspectWeaver.Extensions` to register your handlers in the DI container.
+Use the extension methods provided by `Aymen83.AspectWeaver.Extensions` to register your handlers in the DI container.
 
 ```csharp
-using AspectWeaver.Extensions;
+using Aymen83.AspectWeaver.Extensions;
 
 // In your DI configuration (e.g., Program.cs)
 builder.Services.AddLogging();
@@ -105,7 +105,7 @@ builder.Services.AddAspectWeaverHandlers<Program>();
 
 ### 3. Configure Target Services (Crucial Step)
 
-For AspectWeaver to resolve handlers via DI, the class containing the intercepted methods **must** expose an accessible `IServiceProvider`. This is a requirement of the framework's architecture.
+For Aymen83.AspectWeaver to resolve handlers via DI, the class containing the intercepted methods **must** expose an accessible `IServiceProvider`. This is a requirement of the framework's architecture.
 
 ```csharp
 public class MyService
@@ -155,16 +155,16 @@ public class MyService
 
 When `ProcessDataAsync` is called anywhere in your application, the `SimpleLogHandler` will automatically execute around it.
 
-## Built-in Aspects (AspectWeaver.Extensions)
+## Built-in Aspects (Aymen83.AspectWeaver.Extensions)
 
-The `AspectWeaver.Extensions` package includes several ready-to-use aspects:
+The `Aymen83.AspectWeaver.Extensions` package includes several ready-to-use aspects:
 
 ### `[LogExecution]`
 
 Logs the start, end, duration, and exceptions of a method execution using `ILogger`.
 
 ```csharp
-using AspectWeaver.Extensions.Logging;
+using Aymen83.AspectWeaver.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 
 [LogExecution(Level = LogLevel.Debug, LogArguments = true, LogReturnValue = false)]
@@ -176,8 +176,8 @@ public virtual int Calculate(int a, int b) { ... }
 Provides automatic null checking for parameters marked with `[NotNull]`. Throws `ArgumentNullException` and short-circuits execution if a violation occurs.
 
 ```csharp
-using AspectWeaver.Abstractions.Constraints;
-using AspectWeaver.Extensions.Validation;
+using Aymen83.AspectWeaver.Abstractions.Constraints;
+using Aymen83.AspectWeaver.Extensions.Validation;
 
 [ValidateParameters] // Enables validation for this method
 public virtual string FormatName(
@@ -194,7 +194,7 @@ public virtual string FormatName(
 Implements a simple fixed-delay retry policy for handling transient failures.
 
 ```csharp
-using AspectWeaver.Extensions.Resilience;
+using Aymen83.AspectWeaver.Extensions.Resilience;
 
 [Retry(MaxAttempts = 5, DelayMilliseconds = 200)]
 public virtual async Task<string> FetchFromExternalApiAsync() { ... }
@@ -202,7 +202,7 @@ public virtual async Task<string> FetchFromExternalApiAsync() { ... }
 
 ## Diagnostics Reference
 
-AspectWeaver includes dedicated Roslyn Analyzers and diagnostics within the Source Generator to provide immediate feedback:
+Aymen83.AspectWeaver includes dedicated Roslyn Analyzers and diagnostics within the Source Generator to provide immediate feedback:
 
 | ID | Severity | Description |
 | :--- | :--- | :--- |

@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+            // AW002 should be emitted here.
+            StaticService.DoStaticWork();
+                          ^^^^^^^^^^^^
+        }
+*/
+ [ScrubbedPath]: (17,26)-(17,38),
+      Message: Static method 'DoStaticWork' cannot use aspects requiring dependency injection because there is no instance to provide the IServiceProvider,
+      Severity: Error,
+      Descriptor: {
+        Id: AW002,
+        Title: Aspects requiring DI are not supported on static methods,
+        Description: Aspect weaving with dependency injection relies on accessing IServiceProvider from the target instance, which is unavailable for static methods.,
+        MessageFormat: Static method '{0}' cannot use aspects requiring dependency injection because there is no instance to provide the IServiceProvider,
+        Category: Aymen83.AspectWeaver.DI,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

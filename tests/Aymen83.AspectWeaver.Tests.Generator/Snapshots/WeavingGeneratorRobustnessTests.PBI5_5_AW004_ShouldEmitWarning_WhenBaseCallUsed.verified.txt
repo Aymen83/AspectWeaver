@@ -1,0 +1,25 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+            // Call site 2: 'base.' call (Uninterceptable - AW004)
+            base.Execute();
+                 ^^^^^^^
+        }
+*/
+ [ScrubbedPath]: (45,17)-(45,24),
+      Message: The call to 'Execute' cannot be intercepted. C# 12 Interceptors do not support calls using 'base.' access.,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: AW004,
+        Title: Method call cannot be intercepted due to language limitations,
+        Description: C# 12 Interceptors have limitations on which call patterns can be redirected. Calls using 'base.' access are executed directly.,
+        MessageFormat: The call to '{0}' cannot be intercepted. C# 12 Interceptors do not support calls using 'base.' access.,
+        Category: Aymen83.AspectWeaver.Limitations,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
