@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Extensions/Validation/ValidateParametersHandler.cs
 using Aymen83.AspectWeaver.Abstractions;
 using Aymen83.AspectWeaver.Abstractions.Constraints;
 using System;
@@ -14,12 +13,10 @@ namespace Aymen83.AspectWeaver.Extensions.Validation
     /// </summary>
     public sealed class ValidateParametersHandler : IAspectHandler<ValidateParametersAttribute>
     {
-        // This handler does not require DI.
-
         /// <inheritdoc />
         public async ValueTask<TResult> InterceptAsync<TResult>(ValidateParametersAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
         {
-            // 1. Retrieve parameter metadata using reflection (PBI 4.2).
+            // 1. Retrieve parameter metadata using reflection.
             var parameters = context.MethodInfo.GetParameters();
 
             // 2. Iterate through the parameters defined on the method.
@@ -44,7 +41,6 @@ namespace Aymen83.AspectWeaver.Extensions.Validation
         private static bool HasNotNullConstraint(ParameterInfo parameterInfo)
         {
             // Check if the [NotNullAttribute] is applied to the parameter.
-            // We use GetCustomAttributes for compatibility with .NET Standard 2.0.
             return parameterInfo.GetCustomAttributes(typeof(NotNullAttribute), inherit: false).Any();
         }
     }

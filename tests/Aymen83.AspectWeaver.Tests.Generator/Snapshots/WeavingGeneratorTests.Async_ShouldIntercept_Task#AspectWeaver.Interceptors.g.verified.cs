@@ -5,7 +5,6 @@
 
 #nullable enable
 
-// Suppress warnings for generated code.
 #pragma warning disable CS1591
 #pragma warning disable RS0016
 
@@ -18,22 +17,22 @@ namespace Aymen83.AspectWeaver.Generated
     [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 28, 27)]
+        [InterceptsLocation("[ScrubbedPath]", 25, 27)]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static async global::System.Threading.Tasks.ValueTask InterceptMethod0(this global::TestApp.AsyncService __instance)
+        internal static async global::System.Threading.Tasks.Task InterceptMethod0(this global::TestApp.AsyncService __instance)
         {
             // 1. Resolve IServiceProvider
             global::System.IServiceProvider __serviceProvider = __instance.ServiceProvider;
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
+            // Resolve MethodInfo (Using Type.GetMethod for robustness).
             var __targetType = typeof(global::TestApp.AsyncService);
             var __paramTypes = new global::System.Type[]
             {
             };
-            var __methodInfo = __targetType.GetMethod("DoWorkValueAsync", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for DoWorkValueAsync. This indicates an issue in AspectWeaver.");
+            var __methodInfo = __targetType.GetMethod("DoWorkAsync", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for DoWorkAsync. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
             };
@@ -41,7 +40,7 @@ namespace Aymen83.AspectWeaver.Generated
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
                 methodInfo: __methodInfo,
-                methodName: "DoWorkValueAsync",
+                methodName: "DoWorkAsync",
                 targetTypeName: "global::TestApp.AsyncService",
                 arguments: __arguments
             );
@@ -49,7 +48,7 @@ namespace Aymen83.AspectWeaver.Generated
             // 3. Core: The original method call.
             global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<global::Aymen83.AspectWeaver.Abstractions.VoidResult>> __pipeline = async (ctx) =>
             {
-                await __instance.DoWorkValueAsync().ConfigureAwait(false);
+                await __instance.DoWorkAsync().ConfigureAwait(false);
                 return global::Aymen83.AspectWeaver.Abstractions.VoidResult.Instance;
             };
             

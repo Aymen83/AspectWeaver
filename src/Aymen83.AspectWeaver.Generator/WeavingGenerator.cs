@@ -1,5 +1,4 @@
-﻿using Aymen83.AspectWeaver.Generator.Analysis;
-// Import Diagnostics namespace
+using Aymen83.AspectWeaver.Generator.Analysis;
 using Aymen83.AspectWeaver.Generator.Diagnostics;
 using Aymen83.AspectWeaver.Generator.Emitters;
 using Microsoft.CodeAnalysis;
@@ -84,7 +83,6 @@ namespace Aymen83.AspectWeaver.Generator
             context.RegisterSourceOutput(interceptionTargets.Collect(), ExecuteGeneration);
         }
 
-        // (ExecuteGeneration remains the same)
         private static void ExecuteGeneration(SourceProductionContext context, ImmutableArray<InterceptionTarget> targets)
         {
             if (targets.IsDefaultOrEmpty) return;
@@ -104,14 +102,11 @@ namespace Aymen83.AspectWeaver.Generator
                 // Inject InterceptsLocationAttribute
                 var sourceText1 = SourceText.From(SourceTemplates.InterceptsLocationAttributeSource, Encoding.UTF8);
                 ctx.AddSource("InterceptsLocationAttribute.g.cs", sourceText1);
-
-                // PBI 3.3: Stop injecting PlaceholderServiceProvider
-                // The injection code previously here is removed.
             });
         }
 
         /// <summary>
-        /// Semantic analysis (transform). Updated to include limitation checks (PBI 5.5).
+        /// Analyzes an invocation to determine if it is a valid interception target.
         /// </summary>
         private static (InterceptionTarget? Target, Diagnostic? Diagnostic) AnalyzeInvocation(
             InvocationExpressionSyntax invocation,
@@ -140,7 +135,7 @@ namespace Aymen83.AspectWeaver.Generator
             // Get the precise Location object for diagnostic reporting.
             var diagnosticLocation = GetIdentifierLocation(invocation);
 
-            // 3. PBI 5.5: Check for Architectural Limitations (Ref Structs - AW006).
+            // 3. Check for Architectural Limitations (Ref Structs - AW006).
             foreach (var parameter in methodSymbol.Parameters)
             {
                 // IsRefLikeType is the Roslyn property indicating a 'ref struct' (e.g., Span<T>).
@@ -156,7 +151,7 @@ namespace Aymen83.AspectWeaver.Generator
                 }
             }
 
-            // 4. PBI 5.5: Check for Language Limitations (base. access - AW004).
+            // 4. Check for Language Limitations (base. access - AW004).
             // Analyze the syntax of the invocation expression.
             if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
             {
@@ -172,11 +167,8 @@ namespace Aymen83.AspectWeaver.Generator
                     return (null, diagnostic);
                 }
             }
-            // Note: Detecting local 'this.' calls robustly is complex and often depends on the specific C# compiler version's implementation of Interceptors.
-            // We focus on the definitive limitation ('base.') for the MVP.
 
-
-            // 5. Analyze IServiceProvider availability (PBI 3.2 logic).
+            // 5. Analyze IServiceProvider availability.
 
             // 5.1 Handle Static Method Diagnostic (AW002).
             if (methodSymbol.IsStatic)

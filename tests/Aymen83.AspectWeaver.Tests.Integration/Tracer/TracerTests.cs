@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Tracer;
@@ -9,7 +9,7 @@ public class TracerTests : IntegrationTestBase
 
     public TracerTests()
     {
-        // The constructor runs after IntegrationTestBase constructor, ensuring DI is ready.
+        // The constructor runs after IntegrationTestBase's constructor, ensuring DI is ready.
         // Retrieve the mock instance from the container.
         _tracerMock = GetService<Mock<ITracerMock>>();
     }
@@ -17,10 +17,9 @@ public class TracerTests : IntegrationTestBase
     // Register mocks and services required for the tests.
     protected override void ConfigureServices(IServiceCollection services)
     {
-        // Register the mock itself so it can be retrieved in the test constructor.
+        // Register the mock so it can be retrieved in the test constructor and injected into the TracerHandler.
         var mock = new Mock<ITracerMock>();
         services.AddSingleton(mock);
-        // Register the interface implementation so it can be injected into the TracerHandler.
         services.AddSingleton(mock.Object);
 
         // Register the target service.
@@ -28,7 +27,7 @@ public class TracerTests : IntegrationTestBase
     }
 
     [Fact]
-    public void PBI4_1_Test_SynchronousMethod_ShouldBeTraced()
+    public void SynchronousMethod_ShouldBeTraced()
     {
         // Arrange
         var service = GetService<TracerTargetService>();
@@ -47,7 +46,7 @@ public class TracerTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task PBI4_1_Test_AsynchronousMethod_Success_ShouldBeTraced()
+    public async Task AsynchronousMethod_Success_ShouldBeTraced()
     {
         // Arrange
         var service = GetService<TracerTargetService>();
@@ -65,7 +64,7 @@ public class TracerTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task PBI4_1_Test_AsynchronousMethod_Failure_ShouldBeTraced()
+    public async Task AsynchronousMethod_Failure_ShouldBeTraced()
     {
         // Arrange
         var service = GetService<TracerTargetService>();

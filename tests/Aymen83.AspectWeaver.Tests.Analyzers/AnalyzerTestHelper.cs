@@ -1,5 +1,5 @@
-﻿using Aymen83.AspectWeaver.Abstractions;
-using Aymen83.AspectWeaver.Extensions.Resilience; // Required to get Extensions assembly reference
+using Aymen83.AspectWeaver.Abstractions;
+using Aymen83.AspectWeaver.Extensions.Resilience;
 using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -22,7 +22,6 @@ public class AnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, DefaultVeri
             "net8.0",
             new PackageIdentity("Microsoft.NETCore.App.Ref", "8.0.0"),
             Path.Combine("ref", "net8.0"))
-            // Use Basic.Reference.Assemblies for robustness.
             .AddAssemblies([.. Net80.References.All.Select(r => r.FilePath!)]);
 
         // Add project-specific references (Abstractions and Extensions).

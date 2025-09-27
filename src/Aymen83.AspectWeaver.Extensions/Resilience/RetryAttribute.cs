@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Extensions/Resilience/RetryAttribute.cs
 using Aymen83.AspectWeaver.Abstractions;
 using System;
 
@@ -21,7 +20,6 @@ namespace Aymen83.AspectWeaver.Extensions.Resilience
         /// </summary>
         public RetryAttribute()
         {
-            // Ensure runtime consistency with the compile-time constant.
             Order = DefaultOrder;
         }
 

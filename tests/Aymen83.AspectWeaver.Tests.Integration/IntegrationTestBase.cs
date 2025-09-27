@@ -1,4 +1,4 @@
-﻿using Aymen83.AspectWeaver.Extensions; // Required for AddAspectWeaverHandlers
+using Aymen83.AspectWeaver.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aymen83.AspectWeaver.Tests.Integration;
@@ -25,9 +25,7 @@ public abstract class IntegrationTestBase : IDisposable
         Services = new ServiceCollection();
 
         // 1. Register Handlers
-        // Register handlers from the Extensions assembly (PBI 4.3, 4.4, 4.5).
         Services.AddAspectWeaverHandlers(typeof(AspectWeaverServiceCollectionExtensions).Assembly);
-        // Register handlers defined locally within the test assembly (e.g., for infrastructure tests).
         Services.AddAspectWeaverHandlers(typeof(IntegrationTestBase).Assembly);
 
         // 2. Allow derived tests to register mocks and services.
@@ -42,7 +40,6 @@ public abstract class IntegrationTestBase : IDisposable
     /// </summary>
     protected virtual void ConfigureServices(IServiceCollection services)
     {
-        // Default implementation is empty.
     }
 
     /// <summary>

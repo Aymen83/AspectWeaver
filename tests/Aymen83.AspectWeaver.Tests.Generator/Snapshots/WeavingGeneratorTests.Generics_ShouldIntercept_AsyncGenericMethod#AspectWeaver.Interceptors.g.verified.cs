@@ -5,7 +5,6 @@
 
 #nullable enable
 
-// Suppress warnings for generated code.
 #pragma warning disable CS1591
 #pragma warning disable RS0016
 
@@ -18,53 +17,57 @@ namespace Aymen83.AspectWeaver.Generated
     [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 29, 40)]
+        [InterceptsLocation("[ScrubbedPath]", 26, 34)]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static async global::System.Threading.Tasks.Task<int> InterceptMethod0(this global::TestApp.AsyncService __instance)
+        internal static async global::System.Threading.Tasks.Task<T> InterceptMethod0<T>(this global::TestApp.AsyncGenericService __instance, string key) where T : struct
         {
             // 1. Resolve IServiceProvider
             global::System.IServiceProvider __serviceProvider = __instance.ServiceProvider;
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.AsyncService);
+            // Resolve MethodInfo (Using Type.GetMethod for robustness).
+            var __targetType = typeof(global::TestApp.AsyncGenericService);
             var __paramTypes = new global::System.Type[]
             {
+                typeof(string),
             };
-            var __methodInfo = __targetType.GetMethod("CalculateAsync", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for CalculateAsync. This indicates an issue in AspectWeaver.");
+            var __genericMethodDefinition = __targetType.GetMethod("FetchAsync", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__genericMethodDefinition == null) throw new global::System.InvalidOperationException("Could not resolve Generic Method Definition for FetchAsync. This indicates an issue in AspectWeaver.");
+            var __genericArgs = new global::System.Type[]
+            {
+                typeof(T),
+            };
+            var __methodInfo = __genericMethodDefinition.MakeGenericMethod(__genericArgs);
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
+                { "key", key },
             };
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
                 methodInfo: __methodInfo,
-                methodName: "CalculateAsync",
-                targetTypeName: "global::TestApp.AsyncService",
+                methodName: "FetchAsync",
+                targetTypeName: "global::TestApp.AsyncGenericService",
                 arguments: __arguments
             );
             
             // 3. Core: The original method call.
-            global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<int>> __pipeline = async (ctx) =>
+            global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<T>> __pipeline = async (ctx) =>
             {
-                var result = await __instance.CalculateAsync().ConfigureAwait(false);
+                var result = await __instance.FetchAsync<T>(key).ConfigureAwait(false);
                 return result;
             };
             
             // 4. Wrapping: Apply aspects (from inner to outer).
-            // Aspect 0: global::AsyncAspectAttribute (Order=5)
+            // Aspect 0: global::GenericAspectAttribute (Order=0)
             var __next0 = __pipeline;
-            var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AsyncAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AsyncAspectAttribute>));
-            if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::AsyncAspectAttribute");
-            var __attribute0 = new global::AsyncAspectAttribute("ConfigValue")
-            {
-                Order = 5
-            };
+            var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::GenericAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::GenericAspectAttribute>));
+            if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::GenericAspectAttribute");
+            var __attribute0 = new global::GenericAspectAttribute();
             __pipeline = (ctx) =>
             {
-                return __handler0.InterceptAsync<int>(__attribute0, ctx, __next0);
+                return __handler0.InterceptAsync<T>(__attribute0, ctx, __next0);
             };
             
             // 5. Execute the pipeline.

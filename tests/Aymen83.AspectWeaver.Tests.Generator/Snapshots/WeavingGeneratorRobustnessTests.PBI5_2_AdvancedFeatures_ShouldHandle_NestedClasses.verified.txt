@@ -7,7 +7,7 @@
                                     ^^^^^^^^^^
         }
 */
- [ScrubbedPath]: (57,36)-(57,46),
+ [ScrubbedPath]: (53,36)-(53,46),
       Message: Static method 'StaticWork' cannot use aspects requiring dependency injection because there is no instance to provide the IServiceProvider,
       Severity: Error,
       Descriptor: {

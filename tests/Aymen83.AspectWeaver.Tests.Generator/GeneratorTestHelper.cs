@@ -1,4 +1,3 @@
-﻿// tests/AspectWeaver.Tests.Generator/GeneratorTestHelper.cs
 using Aymen83.AspectWeaver.Abstractions;
 using Aymen83.AspectWeaver.Generator;
 using Basic.Reference.Assemblies;
@@ -10,13 +9,15 @@ namespace Aymen83.AspectWeaver.Tests.Generator;
 
 public static class GeneratorTestHelper
 {
-    // ... (Constants and Properties remain the same)
     private static readonly CSharpParseOptions ParseOptions = new(LanguageVersion.CSharp12);
     private static readonly IEnumerable<MetadataReference> References = LoadReferences();
     private const string MockFilePath = @"SimulatedSource.cs";
 
-
-    // PBI 3.2: Update Verify signature to accept expected diagnostic IDs.
+    /// <summary>
+    /// Verifies the output of the WeavingGenerator for a given source code.
+    /// </summary>
+    /// <param name="sourceCode">The C# source code to compile and generate from.</param>
+    /// <param name="expectedDiagnosticIds">An array of diagnostic IDs that are expected to be reported.</param>
     public static Task Verify(string sourceCode, params string[] expectedDiagnosticIds)
     {
         // 1. Create the compilation object.
@@ -30,7 +31,6 @@ public static class GeneratorTestHelper
             throw new InvalidOperationException("Input compilation has errors. Generator results are unreliable.\n" + string.Join("\n", inputDiagnostics));
         }
 
-        // (Generator instantiation and driver creation remains the same...)
         var generator = new WeavingGenerator().AsSourceGenerator();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
             generators: [generator],
@@ -45,7 +45,7 @@ public static class GeneratorTestHelper
         // Combine all diagnostics (Generator execution + Generated code compilation).
         var allDiagnostics = runResult.Diagnostics.Concat(generatedTrees.SelectMany(t => t.GetDiagnostics())).ToList();
 
-        // PBI 3.2: Validate expected diagnostics.
+        // Validate expected diagnostics.
         var actualDiagnosticIds = allDiagnostics.Select(d => d.Id).ToHashSet();
 
         if (expectedDiagnosticIds.Length > 0)
@@ -79,7 +79,6 @@ public static class GeneratorTestHelper
             .UseDirectory("Snapshots");
     }
 
-    // ... (ScrubFilePath, CreateCompilation, LoadReferences remain the same)
     private static void ScrubFilePath(StringBuilder builder, string filePath)
     {
         // Scrub the raw path (in case Verify snapshots diagnostic messages)

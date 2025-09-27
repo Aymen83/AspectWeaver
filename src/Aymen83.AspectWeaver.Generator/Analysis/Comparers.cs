@@ -1,10 +1,12 @@
-﻿// src/AspectWeaver.Generator/Analysis/Comparers.cs
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Aymen83.AspectWeaver.Generator.Analysis
 {
+    /// <summary>
+    /// Defines equality comparers for the analysis types.
+    /// </summary>
     internal sealed class InterceptionTargetComparer : IEqualityComparer<InterceptionTarget>
     {
         public static readonly InterceptionTargetComparer Instance = new();
@@ -14,10 +16,8 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
             if (ReferenceEquals(x, y)) return true;
             if (x is null || y is null) return false;
 
-            // PBI 3.2: Compare the new property.
             if (x.ProviderAccessExpression != y.ProviderAccessExpression) return false;
 
-            // (Existing comparisons remain)
             if (!x.Location.Equals(y.Location)) return false;
             if (!SymbolEqualityComparer.Default.Equals(x.TargetMethod, y.TargetMethod)) return false;
             return x.AppliedAspects.SequenceEqual(y.AppliedAspects, AspectInfoComparer.Instance);
@@ -25,14 +25,11 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
 
         public int GetHashCode(InterceptionTarget obj)
         {
-            // Manual HashCode combination for .NET Standard 2.0 compatibility.
             unchecked
             {
                 int hash = 17;
                 hash = hash * 23 + obj.Location.GetHashCode();
                 hash = hash * 23 + SymbolEqualityComparer.Default.GetHashCode(obj.TargetMethod);
-
-                // PBI 3.2: Include the new property in the hash.
                 hash = hash * 23 + obj.ProviderAccessExpression.GetHashCode();
 
                 foreach (var aspect in obj.AppliedAspects)
@@ -44,7 +41,6 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
         }
     }
 
-    // (AspectInfoComparer remains the same)
     internal sealed class AspectInfoComparer : IEqualityComparer<AspectInfo>
     {
         public static readonly AspectInfoComparer Instance = new();

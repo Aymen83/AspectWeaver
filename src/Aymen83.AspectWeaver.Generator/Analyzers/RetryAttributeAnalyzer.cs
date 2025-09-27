@@ -1,4 +1,4 @@
-﻿using Aymen83.AspectWeaver.Generator.Diagnostics;
+using Aymen83.AspectWeaver.Generator.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -14,10 +14,9 @@ namespace Aymen83.AspectWeaver.Generator.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class RetryAttributeAnalyzer : DiagnosticAnalyzer
     {
-        // We must use the FQN of the attribute we are analyzing.
         private const string RetryAttributeFullName = "Aymen83.AspectWeaver.Extensions.Resilience.RetryAttribute";
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = 
             [DiagnosticDescriptors.AW005_InvalidAttributeConfiguration];
 
         public override void Initialize(AnalysisContext context)
@@ -81,7 +80,6 @@ namespace Aymen83.AspectWeaver.Generator.Analyzers
             var syntaxReference = attributeData.ApplicationSyntaxReference;
             if (syntaxReference == null) return null;
 
-            // We must cast the syntax node to the specific C# type (AttributeSyntax).
             if (syntaxReference.GetSyntax(context.CancellationToken) is AttributeSyntax attributeSyntax)
             {
                 var argumentSyntax = attributeSyntax.ArgumentList?.Arguments

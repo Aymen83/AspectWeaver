@@ -1,17 +1,12 @@
-﻿// tests/AspectWeaver.Tests.Analyzers/AnalyzerTests.cs
-using Aymen83.AspectWeaver.Generator.Analyzers;
+﻿using Aymen83.AspectWeaver.Generator.Analyzers;
 using Aymen83.AspectWeaver.Generator.Diagnostics;
-// FIX CS0618: Update the Verifier alias to use DefaultVerifier.
 using AspectVerifier = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<Aymen83.AspectWeaver.Generator.Analyzers.AspectTargetAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
 using RetryVerifier = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<Aymen83.AspectWeaver.Generator.Analyzers.RetryAttributeAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
-
 
 namespace Aymen83.AspectWeaver.Tests.Analyzers;
 
 public class AnalyzerTests
 {
-    // (All test methods remain the same as defined in PBI 5.4)
-
     #region AW003 Tests (AspectTargetAnalyzer)
 
     [Fact]
@@ -26,7 +21,7 @@ public class AnalyzerTests
                 [MyAspect] // Valid target
                 public void MyMethod() { }
             }
-            """;
+            """ ;
 
         // Expect no diagnostics.
         await AnalyzerTestHelper.VerifyAnalyzerAsync<AspectTargetAnalyzer>(testCode);
@@ -46,7 +41,7 @@ public class AnalyzerTests
                 [MyAspect] // Invalid target
                 public int MyProperty { get; set; }
             }
-            """;
+            """ ;
 
         // Expect AW003 at the specific location (Line 8, Column 6).
         var expected = AspectVerifier.Diagnostic(DiagnosticDescriptors.AW003_InvalidAspectTarget)
@@ -71,7 +66,7 @@ public class AnalyzerTests
                 [MyAspect] // Invalid target
                 public string _myField;
             }
-            """;
+            """ ;
 
         var expected = AspectVerifier.Diagnostic(DiagnosticDescriptors.AW003_InvalidAspectTarget)
             .WithLocation(9, 6)
@@ -98,7 +93,7 @@ public class AnalyzerTests
                 [Retry] // Valid (Default value)
                 public void Operation2() { }
             }
-            """;
+            """ ;
 
         // Expect no diagnostics.
         await AnalyzerTestHelper.VerifyAnalyzerAsync<RetryAttributeAnalyzer>(testCode);
@@ -115,7 +110,7 @@ public class AnalyzerTests
                 [Retry(MaxAttempts = 0)] // Invalid
                 public void Operation() { }
             }
-            """;
+            """ ;
 
         // Expect AW005 at the location of the invalid value (Line 5, Column 26).
         var expected = RetryVerifier.Diagnostic(DiagnosticDescriptors.AW005_InvalidAttributeConfiguration)
@@ -136,7 +131,7 @@ public class AnalyzerTests
                 [Retry(MaxAttempts = -5)] // Invalid
                 public void Operation() { }
             }
-            """;
+            """ ;
 
         // Expect AW005 at the location of the invalid value (Line 5, 26).
         var expected = RetryVerifier.Diagnostic(DiagnosticDescriptors.AW005_InvalidAttributeConfiguration)

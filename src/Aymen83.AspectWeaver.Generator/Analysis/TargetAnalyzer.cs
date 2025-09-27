@@ -1,4 +1,4 @@
-﻿// src/AspectWeaver.Generator/Analysis/TargetAnalyzer.cs
+// src/AspectWeaver.Generator/Analysis/TargetAnalyzer.cs
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -8,9 +8,12 @@ using System.Threading;
 
 namespace Aymen83.AspectWeaver.Generator.Analysis
 {
+    /// <summary>
+    /// Analyzes method symbols to identify applicable aspects and their properties.
+    /// </summary>
     internal static class TargetAnalyzer
     {
-        // PBI 5.2 FIX: Define the conventional name for the default order constant.
+        // Defines the conventional name for the default order constant.
         private const string DefaultOrderFieldName = "DefaultOrder";
 
         /// <summary>
@@ -32,7 +35,6 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
                     {
                         if (addedAttributeTypes.Add(attributeClass))
                         {
-                            // Call the updated ExtractOrder method.
                             var order = ExtractOrder(attributeData);
                             aspects.Add(new AspectInfo(attributeData, order));
                         }
@@ -40,7 +42,6 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
                 }
             }
 
-            // (Hierarchy traversal logic remains the same...)
             // 1. Check the method itself and its overrides (base classes).
             var currentMethod = methodSymbol;
             while (currentMethod != null)
@@ -90,7 +91,6 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
             return [.. aspects.OrderBy(a => a.Order)];
         }
 
-        // (IsDerivedFrom remains the same)
         private static bool IsDerivedFrom(INamedTypeSymbol? type, INamedTypeSymbol baseType)
         {
             var current = type;
@@ -102,7 +102,12 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
             return false;
         }
 
-        // PBI 5.2 FIX: Robustly extract the Order value.
+        /// <summary>
+        /// Extracts the 'Order' value from an AspectAttribute, following a specific precedence:
+        /// 1. Named argument on the attribute instance (e.g., [MyAspect(Order = 5)]).
+        /// 2. A public const int field named 'DefaultOrder' on the attribute class.
+        /// 3. A fallback value of 0.
+        /// </summary>
         private static int ExtractOrder(AttributeData attributeData)
         {
             // 1. Check Named Arguments (Explicit override at usage site: [MyAspect(Order = 5)])
@@ -138,7 +143,9 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
             return 0;
         }
 
-        // (CalculateIdentifierLocation remains the same)
+        /// <summary>
+        /// Calculates the file path, line, and character for an interception location.
+        /// </summary>
         public static InterceptionLocation CalculateIdentifierLocation(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
             // Determine the syntax node representing the identifier being called.

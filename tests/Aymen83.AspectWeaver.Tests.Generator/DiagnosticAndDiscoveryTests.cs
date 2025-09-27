@@ -5,8 +5,6 @@ public class DiagnosticAndDiscoveryTests
     private const string AW001 = "AW001";
     private const string AW002 = "AW002";
 
-    // Success Cases (Discovery)
-
     [Fact]
     public Task PBI3_2_Discovery_ShouldSucceed_WhenPublicProperty_ServiceProvider()
     {
@@ -37,7 +35,6 @@ public class DiagnosticAndDiscoveryTests
             }
             """;
 
-        // We expect no diagnostics.
         return GeneratorTestHelper.Verify(input);
     }
 
@@ -110,8 +107,6 @@ public class DiagnosticAndDiscoveryTests
         return GeneratorTestHelper.Verify(input);
     }
 
-    // Failure Cases (Diagnostics)
-
     [Fact]
     public Task PBI3_2_AW001_ShouldEmitError_WhenServiceProviderNotFound()
     {
@@ -141,7 +136,6 @@ public class DiagnosticAndDiscoveryTests
             }
             """;
 
-        // We expect AW001.
         return GeneratorTestHelper.Verify(input, AW001);
     }
 
@@ -172,7 +166,6 @@ public class DiagnosticAndDiscoveryTests
             }
             """;
 
-        // We expect AW002.
         return GeneratorTestHelper.Verify(input, AW002);
     }
 
@@ -207,7 +200,6 @@ public class DiagnosticAndDiscoveryTests
             }
             """;
 
-        // We expect AW001.
         return GeneratorTestHelper.Verify(input, AW001);
     }
 }

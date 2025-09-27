@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Extensions/Logging/LogExecutionAttribute.cs
 using Aymen83.AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,7 +21,6 @@ namespace Aymen83.AspectWeaver.Extensions.Logging
         /// </summary>
         public LogExecutionAttribute()
         {
-            // Ensure runtime consistency with the compile-time constant.
             Order = DefaultOrder;
         }
 

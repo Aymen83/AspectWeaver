@@ -1,16 +1,25 @@
-﻿using Aymen83.AspectWeaver.Extensions.Resilience;
+using Aymen83.AspectWeaver.Extensions.Resilience;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Resilience;
 
-public class RetryTargetService(IServiceProvider serviceProvider)
+public class RetryTargetService
 {
-    // Expose IServiceProvider (Epic 3 requirement).
-    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
+    // Expose IServiceProvider for the weaver to resolve aspect handlers.
+    internal IServiceProvider ServiceProvider { get; } = null!;
 
-    // Tracks the number of times the method body has started execution.
+    public RetryTargetService(IServiceProvider serviceProvider)
+    {
+        ServiceProvider = serviceProvider;
+    }
+
+    /// <summary>
+    /// Tracks the number of times the method body has started execution.
+    /// </summary>
     public int ExecutionCount { get; private set; }
 
-    // Configurable threshold for when the method should start succeeding.
+    /// <summary>
+    /// Configurable threshold for when the method should start succeeding.
+    /// </summary>
     public int SucceedOnAttempt { get; set; } = 1;
 
     [Retry(MaxAttempts = 5, DelayMilliseconds = 50)]

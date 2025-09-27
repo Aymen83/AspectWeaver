@@ -1,18 +1,16 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace Aymen83.AspectWeaver.Generator.Diagnostics
 {
+    /// <summary>
+    /// Defines the diagnostic descriptors used by the AspectWeaver generator and analyzers.
+    /// </summary>
     internal static class DiagnosticDescriptors
     {
-        // Categories
         private const string CategoryDI = "Aymen83.AspectWeaver.DI";
         private const string CategoryUsage = "Aymen83.AspectWeaver.Usage";
         private const string CategoryConfiguration = "Aymen83.AspectWeaver.Configuration";
-        // PBI 5.5: New Category for technical limitations
         private const string CategoryLimitations = "Aymen83.AspectWeaver.Limitations";
-
-        // AW001, AW002, AW003, AW005 remain the same...
-        // (Ensure AW001, AW002, AW003, AW005 definitions are present as finalized previously)
 
         public static readonly DiagnosticDescriptor AW001_ServiceProviderNotFound = new(
            id: "AW001",
@@ -45,18 +43,14 @@ namespace Aymen83.AspectWeaver.Generator.Diagnostics
              customTags: [WellKnownDiagnosticTags.CompilationEnd]
          );
 
-        // PBI 5.5: New Diagnostics
-
         /// <summary>
         /// AW004: Warning when an invocation pattern cannot be intercepted by C# 12 Interceptors.
         /// </summary>
         public static readonly DiagnosticDescriptor AW004_UninterceptableCallPattern = new(
             id: "AW004",
             title: "Method call cannot be intercepted due to language limitations",
-            // Ensure single line and period for RS1032 compliance.
             messageFormat: "The call to '{0}' cannot be intercepted. C# 12 Interceptors do not support calls using 'base.' access.",
             category: CategoryLimitations,
-            // Severity is Warning because the code is valid C#, but the aspect will not run for this specific call site.
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: "C# 12 Interceptors have limitations on which call patterns can be redirected. Calls using 'base.' access are executed directly."
@@ -78,7 +72,6 @@ namespace Aymen83.AspectWeaver.Generator.Diagnostics
         public static readonly DiagnosticDescriptor AW006_RefStructNotSupported = new(
             id: "AW006",
             title: "Aspects are not supported on methods with ref struct parameters",
-            // Ensure single line and period for RS1032 compliance.
             messageFormat: "Method '{0}' cannot use aspects because it has a 'ref struct' parameter ('{1}'). Parameters like Span<T> or ReadOnlySpan<T> cannot be safely captured by the interception pipeline.",
             category: CategoryLimitations,
             defaultSeverity: DiagnosticSeverity.Error,

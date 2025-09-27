@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Aymen83.AspectWeaver.Abstractions.Constraints
 {
@@ -10,6 +10,5 @@ namespace Aymen83.AspectWeaver.Abstractions.Constraints
     [AttributeUsage(AttributeTargets.Parameter, Inherited = false, AllowMultiple = false)]
     public sealed class NotNullAttribute : Attribute
     {
-        // This is a marker attribute; no implementation is needed.
     }
 }

@@ -2,12 +2,12 @@
   Diagnostics: [
     {
       Location: /*
-            // This is the invocation site we expect to intercept.
+        {
             StaticService.LogMessage("Hello AspectWeaver");
                           ^^^^^^^^^^
         }
 */
- [ScrubbedPath]: (21,26)-(21,36),
+ [ScrubbedPath]: (19,26)-(19,36),
       Message: Static method 'LogMessage' cannot use aspects requiring dependency injection because there is no instance to provide the IServiceProvider,
       Severity: Error,
       Descriptor: {

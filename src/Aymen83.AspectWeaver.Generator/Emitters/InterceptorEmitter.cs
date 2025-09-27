@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Generator/Emitters/InterceptorEmitter.cs
 using Aymen83.AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,6 +6,9 @@ using System.Linq;
 
 namespace Aymen83.AspectWeaver.Generator.Emitters
 {
+    /// <summary>
+    /// Emits the C# source code for the interceptor methods.
+    /// </summary>
     internal static class InterceptorEmitter
     {
         private const string GeneratedNamespace = "Aymen83.AspectWeaver.Generated";
@@ -26,14 +28,13 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
 
             // System.Runtime.CompilerServices is required for [InterceptsLocation] and [MethodImpl].
             writer.WriteLine("using System.Runtime.CompilerServices;");
-            // PBI 5.3: System.Diagnostics is required for Debugger attributes.
+            // System.Diagnostics is required for Debugger attributes.
             writer.WriteLine("using System.Diagnostics;");
             writer.WriteLine();
 
             writer.WriteLine($"namespace {GeneratedNamespace}");
             writer.OpenBlock();
 
-            // PBI 5.3: Apply Debugger attributes to the class.
             EmitDebuggerAttributes(writer);
             writer.WriteLine($"internal static class {GeneratedClassName}");
             writer.OpenBlock();
@@ -54,7 +55,9 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             return writer.ToString();
         }
 
-        // PBI 5.3: New helper method for debugger attributes.
+        /// <summary>
+        /// Emits debugger attributes to improve the debugging experience by stepping over generated code.
+        /// </summary>
         private static void EmitDebuggerAttributes(IndentedWriter writer)
         {
             // Instruct the debugger to step over this generated infrastructure code.
@@ -63,10 +66,8 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.WriteLine("[global::System.Diagnostics.DebuggerNonUserCode]");
         }
 
-
         private static void EmitInterceptorMethod(IndentedWriter writer, InterceptionTarget target, string interceptorName)
         {
-            // (Implementation remains the same as PBI 5.1)
             var signature = new MethodSignature(target.TargetMethod);
 
             // 1. Emit [InterceptsLocation] attribute
@@ -96,14 +97,12 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
 
         private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
         {
-            // (Implementation remains the same)
             string filePathLiteral = SymbolDisplay.FormatLiteral(location.FilePath, true);
             writer.WriteLine($"[InterceptsLocation({filePathLiteral}, {location.Line}, {location.Character})]");
         }
 
         private static void EmitPerformanceAttributes(IndentedWriter writer)
         {
-            // (Implementation remains the same)
             writer.WriteLine("[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]");
         }
     }

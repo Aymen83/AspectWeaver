@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Generator/Emitters/MethodSignature.cs
 using Aymen83.AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
@@ -7,9 +6,11 @@ using System.Text;
 
 namespace Aymen83.AspectWeaver.Generator.Emitters
 {
+    /// <summary>
+    /// Represents the signature of a method, providing properties for code generation.
+    /// </summary>
     internal sealed record MethodSignature
     {
-        // Base Format (Stabilized previously)
         // This format is used for Types (return types, parameters, AND constraint types).
         private static readonly SymbolDisplayFormat Format = new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
@@ -18,7 +19,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             miscellaneousOptions:
                 SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers |
                 SymbolDisplayMiscellaneousOptions.UseSpecialTypes |
-                // Use the flag that works in your environment:
                 SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
         );
 
@@ -29,8 +29,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
                SymbolDisplayParameterOptions.IncludeDefaultValue
            );
 
-
-        // (Properties and Constants remain the same)
         public const string InstanceParameterName = "__instance";
         private const string VoidResultFullName = "global::Aymen83.AspectWeaver.Abstractions.VoidResult";
 
@@ -49,7 +47,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         {
             IsInstanceMethod = !method.IsStatic;
 
-            // 1. Parameters and Arguments (Existing logic)
+            // 1. Parameters and Arguments
             var parameterList = new List<string>();
             var argumentList = new List<string>();
             if (IsInstanceMethod)
@@ -71,8 +69,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             Parameters = string.Join(", ", parameterList);
             Arguments = string.Join(", ", argumentList);
 
-
-            // 2. PBI 2.7: Handle Generics
+            // 2. Handle Generics
             if (method.IsGenericMethod)
             {
                 // Manually construct the <T1, T2> string.

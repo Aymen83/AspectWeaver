@@ -1,9 +1,14 @@
-﻿namespace Aymen83.AspectWeaver.Tests.Integration.Tracer;
+namespace Aymen83.AspectWeaver.Tests.Integration.Tracer;
 
-public class TracerTargetService(IServiceProvider serviceProvider)
+public class TracerTargetService
 {
-    // CRITICAL: Expose IServiceProvider to enable DI integration (Epic 3 requirement, avoids AW001).
-    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
+    // Expose IServiceProvider to enable DI for aspects.
+    internal IServiceProvider ServiceProvider { get; } = null!;
+
+    public TracerTargetService(IServiceProvider serviceProvider)
+    {
+        ServiceProvider = serviceProvider;
+    }
 
     [Tracer]
     public virtual int Calculate(int a, int b)

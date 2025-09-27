@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Extensions/Resilience/RetryHandler.cs
 using Aymen83.AspectWeaver.Abstractions;
 using System;
 using System.Threading.Tasks;
@@ -11,8 +10,6 @@ namespace Aymen83.AspectWeaver.Extensions.Resilience
     /// </summary>
     public sealed class RetryHandler : IAspectHandler<RetryAttribute>
     {
-        // This handler does not require DI for its core logic.
-
         /// <inheritdoc />
         public async ValueTask<TResult> InterceptAsync<TResult>(RetryAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
         {
@@ -52,10 +49,8 @@ namespace Aymen83.AspectWeaver.Extensions.Resilience
                     // Wait before the next attempt (non-blocking delay).
                     if (delayMs > 0)
                     {
-                        // We use Task.Delay for asynchronous waiting.
                         await Task.Delay(delayMs).ConfigureAwait(false);
                     }
-                    // The loop continues for the next attempt.
                 }
             }
         }

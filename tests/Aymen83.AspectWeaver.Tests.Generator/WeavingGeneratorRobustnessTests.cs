@@ -1,5 +1,4 @@
-﻿// tests/AspectWeaver.Tests.Generator/WeavingGeneratorRobustnessTests.cs
-namespace Aymen83.AspectWeaver.Tests.Generator;
+﻿namespace Aymen83.AspectWeaver.Tests.Generator;
 
 public class WeavingGeneratorRobustnessTests
 {
@@ -16,31 +15,27 @@ public class WeavingGeneratorRobustnessTests
         // AspectA (Order 10)
         public class AspectAAttribute : AspectAttribute {
             public const int DefaultOrder = 10;
-            public AspectAAttribute() { Order = DefaultOrder; }
         }
         // AspectB (Order 20)
         public class AspectBAttribute : AspectAttribute {
             public const int DefaultOrder = 20;
-            public AspectBAttribute() { Order = DefaultOrder; }
         }
         // AspectC (Order 5)
         public class AspectCAttribute : AspectAttribute {
             public const int DefaultOrder = 5;
-            public AspectCAttribute() { Order = DefaultOrder; }
         }
         // UniqueAspect (Order 1)
         public class UniqueAspectAttribute : AspectAttribute {
             public const int DefaultOrder = 1;
-            public UniqueAspectAttribute() { Order = DefaultOrder; }
         }
 
-        """;
+        """ ;
 
     // Helper infrastructure setup (IServiceProvider) required to satisfy AW001 for internal/private access.
     private const string InfrastructureSetupInternal = """
         // Setup required IServiceProvider for internal access.
         internal IServiceProvider ServiceProvider { get; } = null!;
-        """;
+        """ ;
 
     // Helper function to combine common setup with specific test code and run verification.
     private static Task VerifyRobustness(string sourceCode, params string[] expectedDiagnosticIds)
@@ -48,8 +43,6 @@ public class WeavingGeneratorRobustnessTests
         // Combine CommonSetup, the source code (which often includes InfrastructureSetup), and run the verification.
         return GeneratorTestHelper.Verify(CommonSetup + sourceCode, expectedDiagnosticIds);
     }
-
-    // PBI 5.2 Tests
 
     [Fact]
     public Task PBI5_2_AdvancedFeatures_ShouldHandle_InAndParamsParameters()
@@ -84,7 +77,7 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         // We expect two distinct interception sites.
         return VerifyRobustness(input);
@@ -129,7 +122,7 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         return VerifyRobustness(input, "AW002");
     }
@@ -138,13 +131,11 @@ public class WeavingGeneratorRobustnessTests
     public Task PBI5_2_Inheritance_ShouldInheritFromInterface_ImplicitImplementation()
     {
         // Scenario: Aspect applied on an interface method, implemented implicitly.
-        // FIX: The interface MUST expose IServiceProvider to satisfy AW001 when called via interface reference.
         var input = """
             namespace TestApp
             {
                 public interface IService
                 {
-                    // FIX: Expose IServiceProvider on the interface.
                     IServiceProvider ServiceProvider { get; }
 
                     [AspectAAttribute] // Applied on the interface
@@ -174,7 +165,7 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         // We expect two distinct interception sites.
         return VerifyRobustness(input);
@@ -215,7 +206,7 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         // We expect two distinct interception sites.
         return VerifyRobustness(input);
@@ -225,13 +216,11 @@ public class WeavingGeneratorRobustnessTests
     public Task PBI5_2_Inheritance_ShouldMergeAndOrderCorrectly_MultiLevel()
     {
         // Scenario: Aspects applied at multiple levels.
-        // FIX: Interface must expose IServiceProvider.
         var input = """
             namespace TestApp
             {
                 public interface IWorker
                 {
-                    // FIX: Expose IServiceProvider
                     IServiceProvider ServiceProvider { get; }
 
                     [AspectAAttribute] // Order 10
@@ -269,12 +258,10 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         return VerifyRobustness(input);
     }
-
-    // PBI 5.5 Tests (Limitations)
 
     [Fact]
     public Task PBI5_5_AW006_ShouldEmitError_WhenRefStructParameterUsed()
@@ -307,7 +294,7 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         return VerifyRobustness(input, "AW006");
     }
@@ -353,7 +340,7 @@ public class WeavingGeneratorRobustnessTests
                     }
                 }
             }
-            """;
+            """ ;
 
         // We expect AW004 for the 'base.Execute()' call site.
         // The other call sites (Helper and external Execute) should still be intercepted.

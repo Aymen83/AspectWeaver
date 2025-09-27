@@ -1,12 +1,17 @@
-﻿using Aymen83.AspectWeaver.Extensions.Logging;
+using Aymen83.AspectWeaver.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Logging;
 
-public class LoggingTargetService(IServiceProvider serviceProvider)
+public class LoggingTargetService
 {
-    // CRITICAL: Expose IServiceProvider (Epic 3 requirement).
-    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
+    // Expose IServiceProvider to enable DI for aspects.
+    internal IServiceProvider ServiceProvider { get; } = null!;
+
+    public LoggingTargetService(IServiceProvider serviceProvider)
+    {
+        ServiceProvider = serviceProvider;
+    }
 
     [LogExecution(Level = LogLevel.Information, LogArguments = true, LogReturnValue = true)]
     public virtual int SyncMethod(int input)

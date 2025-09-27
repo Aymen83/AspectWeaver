@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Extensions/Logging/LogExecutionHandler.cs
 using Aymen83.AspectWeaver.Abstractions;
 using Microsoft.Extensions.Logging;
 using System;
@@ -65,7 +64,6 @@ namespace Aymen83.AspectWeaver.Extensions.Logging
             }
         }
 
-        // (Private helper methods LogEntry, LogExit, LogException remain the same - they do not require XML docs)
         private static void LogEntry(ILogger logger, LogExecutionAttribute attribute, InvocationContext context)
         {
             if (attribute.LogArguments)

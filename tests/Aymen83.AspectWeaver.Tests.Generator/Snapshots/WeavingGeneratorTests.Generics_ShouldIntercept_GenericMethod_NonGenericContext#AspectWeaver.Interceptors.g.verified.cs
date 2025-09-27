@@ -5,7 +5,6 @@
 
 #nullable enable
 
-// Suppress warnings for generated code.
 #pragma warning disable CS1591
 #pragma warning disable RS0016
 
@@ -18,26 +17,27 @@ namespace Aymen83.AspectWeaver.Generated
     [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 29, 28)]
+        [InterceptsLocation("[ScrubbedPath]", 24, 34)]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static T InterceptMethod0<T>(this global::TestApp.ConstrainedService __instance, T input) where T : class, global::System.IDisposable, new()
+        internal static int InterceptMethod0<TInput, TResult>(this global::TestApp.UtilityService __instance, string input)
         {
             // 1. Resolve IServiceProvider
             global::System.IServiceProvider __serviceProvider = __instance.ServiceProvider;
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.ConstrainedService);
+            // Resolve MethodInfo (Using Type.GetMethod for robustness).
+            var __targetType = typeof(global::TestApp.UtilityService);
             var __paramTypes = new global::System.Type[]
             {
-                typeof(T),
+                typeof(string),
             };
-            var __genericMethodDefinition = __targetType.GetMethod("Process", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__genericMethodDefinition == null) throw new global::System.InvalidOperationException("Could not resolve Generic Method Definition for Process. This indicates an issue in AspectWeaver.");
+            var __genericMethodDefinition = __targetType.GetMethod("Convert", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__genericMethodDefinition == null) throw new global::System.InvalidOperationException("Could not resolve Generic Method Definition for Convert. This indicates an issue in AspectWeaver.");
             var __genericArgs = new global::System.Type[]
             {
-                typeof(T),
+                typeof(string),
+                typeof(int),
             };
             var __methodInfo = __genericMethodDefinition.MakeGenericMethod(__genericArgs);
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
@@ -48,16 +48,16 @@ namespace Aymen83.AspectWeaver.Generated
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
                 methodInfo: __methodInfo,
-                methodName: "Process",
-                targetTypeName: "global::TestApp.ConstrainedService",
+                methodName: "Convert",
+                targetTypeName: "global::TestApp.UtilityService",
                 arguments: __arguments
             );
             
             // 3. Core: The original method call.
-            global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<T>> __pipeline = (ctx) =>
+            global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<int>> __pipeline = (ctx) =>
             {
-                var result = __instance.Process<T>(input);
-                return new global::System.Threading.Tasks.ValueTask<T>(result);
+                var result = __instance.Convert<TInput, TResult>(input);
+                return new global::System.Threading.Tasks.ValueTask<int>(result);
             };
             
             // 4. Wrapping: Apply aspects (from inner to outer).
@@ -68,7 +68,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __attribute0 = new global::GenericAspectAttribute();
             __pipeline = (ctx) =>
             {
-                return __handler0.InterceptAsync<T>(__attribute0, ctx, __next0);
+                return __handler0.InterceptAsync<int>(__attribute0, ctx, __next0);
             };
             
             // 5. Execute the pipeline.

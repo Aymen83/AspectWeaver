@@ -1,4 +1,3 @@
-﻿// src/AspectWeaver.Generator/Emitters/PipelineEmitter.cs
 using Aymen83.AspectWeaver.Generator.Analysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -6,9 +5,11 @@ using System.Linq;
 
 namespace Aymen83.AspectWeaver.Generator.Emitters
 {
+    /// <summary>
+    /// Emits the aspect pipeline for an intercepted method.
+    /// </summary>
     internal static class PipelineEmitter
     {
-        // (Constants remain the same)
         private const string FuncType = "global::System.Func";
         private const string ValueTaskType = "global::System.Threading.Tasks.ValueTask";
         private const string InvocationContextType = "global::Aymen83.AspectWeaver.Abstractions.InvocationContext";
@@ -18,11 +19,9 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         private const string InvalidOperationExceptionType = "global::System.InvalidOperationException";
         private const string VoidResultFullName = "global::Aymen83.AspectWeaver.Abstractions.VoidResult";
 
-        // (Variable names remain the same)
         private const string ContextVar = "__context";
         private const string PipelineVar = "__pipeline";
         private const string ServiceProviderVar = "__serviceProvider";
-        // PBI 4.2: New variable name
         private const string MethodInfoVar = "__methodInfo";
 
         public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
@@ -32,7 +31,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             // 1. Resolve IServiceProvider
             EmitServiceProviderResolution(writer, target);
 
-            // 2. Create InvocationContext (Updated for PBI 4.2)
+            // 2. Create InvocationContext
             string targetInstanceExpression = signature.IsInstanceMethod ? MethodSignature.InstanceParameterName : "null";
             EmitInvocationContext(writer, target, targetInstanceExpression);
 
@@ -46,7 +45,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             EmitPipelineExecution(writer, signature);
         }
 
-        #region Step 1: Service Provider Resolution (PBI 3.3 Implementation)
+        #region Step 1: Service Provider Resolution
         private static void EmitServiceProviderResolution(IndentedWriter writer, InterceptionTarget target)
         {
             writer.WriteLine($"// 1. Resolve IServiceProvider");
@@ -64,13 +63,13 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         }
         #endregion
 
-        #region Step 2: Invocation Context (PBI 4.2 Implementation)
+        #region Step 2: Invocation Context
         private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression)
         {
             var method = target.TargetMethod;
             writer.WriteLine($"// 2. Create InvocationContext");
 
-            // 2.1. PBI 4.2: Retrieve MethodInfo
+            // 2.1. Retrieve MethodInfo
             EmitMethodInfoRetrieval(writer, target);
 
             // 2.2. Pack Arguments
@@ -78,7 +77,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.OpenBlock();
             foreach (var param in method.Parameters)
             {
-                // Use positional arguments for compatibility.
                 var paramNameLiteral = SymbolDisplay.FormatLiteral(param.Name, true);
                 writer.WriteLine($"{{ {paramNameLiteral}, {param.Name} }},");
             }
@@ -95,7 +93,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.Indent();
             writer.WriteLine($"targetInstance: {targetInstanceExpression},");
             writer.WriteLine($"serviceProvider: {ServiceProviderVar},");
-            // PBI 4.2: Pass the retrieved MethodInfo
             writer.WriteLine($"methodInfo: {MethodInfoVar},");
             writer.WriteLine($"methodName: {methodNameLiteral},");
             writer.WriteLine($"targetTypeName: {typeNameLiteral},");
@@ -105,10 +102,10 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.WriteLine();
         }
 
-        // PBI 4.2: Helper to generate the MethodInfo retrieval logic using Type.GetMethod().
+        // Helper to generate the MethodInfo retrieval logic using Type.GetMethod().
         private static void EmitMethodInfoRetrieval(IndentedWriter writer, InterceptionTarget target)
         {
-            writer.WriteLine("// PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).");
+            writer.WriteLine("// Resolve MethodInfo (Using Type.GetMethod for robustness).");
 
             var method = target.TargetMethod;
 
@@ -179,7 +176,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         #endregion
 
         #region Step 3: Core Delegate
-        // (Implementation remains the same as PBI 2.6)
         private static void EmitCoreDelegate(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string delegateType)
         {
             writer.WriteLine($"// 3. Core: The original method call.");
@@ -241,7 +237,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         }
         #endregion
 
-        #region Step 4: Aspect Chain (Includes User Fix)
+        #region Step 4: Aspect Chain
         private static void EmitAspectChain(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
         {
             writer.WriteLine("// 4. Wrapping: Apply aspects (from inner to outer).");
@@ -266,10 +262,8 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
 
             var handlerVar = $"__handler{index}";
 
-            // USER FIX APPLIED: Use nullable cast (?) to satisfy CS8600 in strict mode.
             writer.WriteLine($"var {handlerVar} = ({handlerInterfaceType}?){ServiceProviderVar}.GetService(typeof({handlerInterfaceType}));");
 
-            // Use positional arguments for compatibility.
             var exceptionMessageLiteral = SymbolDisplay.FormatLiteral($"Handler not registered for aspect: {attributeType}", true);
             writer.WriteLine($"if ({handlerVar} == null) throw new {InvalidOperationExceptionType}({exceptionMessageLiteral});");
 
@@ -285,7 +279,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         }
 
         #region Attribute Rehydration
-        // (Implementation remains the same)
         private static void EmitAttributeRehydration(IndentedWriter writer, string varName, string attributeType, AttributeData attributeData)
         {
             var constructorArgs = string.Join(", ", attributeData.ConstructorArguments.Select(arg => TypedConstantToString(arg)));
@@ -342,7 +335,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         #endregion
 
         #region Step 5: Execution
-        // (Implementation remains the same as PBI 2.6)
         private static void EmitPipelineExecution(IndentedWriter writer, MethodSignature signature)
         {
             writer.WriteLine("// 5. Execute the pipeline.");

@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using Aymen83.AspectWeaver.Generator.Diagnostics;
@@ -14,12 +14,11 @@ namespace Aymen83.AspectWeaver.Generator.Analyzers
     {
         private const string AspectAttributeFullName = "Aymen83.AspectWeaver.Abstractions.AspectAttribute";
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = 
             [DiagnosticDescriptors.AW003_InvalidAspectTarget];
 
         public override void Initialize(AnalysisContext context)
         {
-            // Standard boilerplate for analyzers.
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
 

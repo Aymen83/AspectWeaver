@@ -1,8 +1,8 @@
 # Aymen83.AspectWeaver
 
 [![Build and Test](https://github.com/Aymen83/AspectWeaver/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/Aymen83/AspectWeaver/actions/workflows/build-and-test.yml)
-[![NuGet Version (Aymen83.AspectWeaver)](https://img.shields.io/nuget/v/AspectWeaver.svg?label=AspectWeaver)](https://www.nuget.org/packages/AspectWeaver/)
-[![NuGet Version (Aymen83.AspectWeaver.Extensions)](https://img.shields.io/nuget/v/AspectWeaver.Extensions.svg?label=AspectWeaver.Extensions)](https://www.nuget.org/packages/AspectWeaver.Extensions/)
+[![NuGet Version (Aymen83.AspectWeaver)](https://img.shields.io/nuget/v/Aymen83.AspectWeaver.svg?label=AspectWeaver)](https://www.nuget.org/packages/Aymen83.AspectWeaver/)
+[![NuGet Version (Aymen83.AspectWeaver.Extensions)](https://img.shields.io/nuget/v/Aymen83.AspectWeaver.Extensions.svg?label=AspectWeaver.Extensions)](https://www.nuget.org/packages/Aymen83.AspectWeaver.Extensions/)
 
 Aymen83.AspectWeaver is a modern, high-performance Aspect-Oriented Programming (AOP) framework for .NET, leveraging the power of C# 12 Source Generators and Interceptors. It enables developers to implement cross-cutting concerns (like logging, validation, and resilience) cleanly without polluting the business logic.
 

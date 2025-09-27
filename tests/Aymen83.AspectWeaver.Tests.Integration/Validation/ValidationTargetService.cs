@@ -1,14 +1,19 @@
-﻿using Aymen83.AspectWeaver.Abstractions.Constraints;
+using Aymen83.AspectWeaver.Abstractions.Constraints;
 using Aymen83.AspectWeaver.Extensions.Validation;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Validation;
 
-public class ValidationTargetService(IServiceProvider serviceProvider)
+public class ValidationTargetService
 {
-    // Expose IServiceProvider (Epic 3 requirement).
-    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
+    // Expose IServiceProvider for the weaver to resolve aspect handlers.
+    internal IServiceProvider ServiceProvider { get; } = null!;
 
-    // Property used to verify if the method body executed.
+    public ValidationTargetService(IServiceProvider serviceProvider)
+    {
+        ServiceProvider = serviceProvider;
+    }
+
+    // This property is used by tests to verify if the method body was executed.
     public bool WasExecuted { get; private set; }
 
     [ValidateParameters]
@@ -21,10 +26,9 @@ public class ValidationTargetService(IServiceProvider serviceProvider)
         return $"Processed: {requiredInput}";
     }
 
-    // Test case without the [ValidateParameters] aspect.
+    // This method is used to test that constraints are not enforced if the [ValidateParameters] aspect is missing.
     public virtual void MethodWithoutValidation([NotNull] string input)
     {
         WasExecuted = true;
-        // Constraints should not be enforced if the aspect is missing.
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Aymen83.AspectWeaver.Tests.Integration.Tracer;
+namespace Aymen83.AspectWeaver.Tests.Integration.Tracer;
 
 /// <summary>
 /// Interface used to mock and verify aspect execution.

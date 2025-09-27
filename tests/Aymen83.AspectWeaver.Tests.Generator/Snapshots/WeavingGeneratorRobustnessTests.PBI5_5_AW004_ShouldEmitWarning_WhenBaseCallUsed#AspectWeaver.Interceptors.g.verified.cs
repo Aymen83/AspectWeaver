@@ -5,7 +5,6 @@
 
 #nullable enable
 
-// Suppress warnings for generated code.
 #pragma warning disable CS1591
 #pragma warning disable RS0016
 
@@ -18,7 +17,7 @@ namespace Aymen83.AspectWeaver.Generated
     [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 43, 18)]
+        [InterceptsLocation("[ScrubbedPath]", 39, 18)]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static void InterceptMethod0(this global::TestApp.DerivedService __instance)
         {
@@ -27,7 +26,7 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
+            // Resolve MethodInfo (Using Type.GetMethod for robustness).
             var __targetType = typeof(global::TestApp.DerivedService);
             var __paramTypes = new global::System.Type[]
             {
@@ -69,7 +68,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __finalResult = __pipeline(__context).GetAwaiter().GetResult();
         }
         
-        [InterceptsLocation("[ScrubbedPath]", 59, 21)]
+        [InterceptsLocation("[ScrubbedPath]", 55, 21)]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static void InterceptMethod1(this global::TestApp.DerivedService __instance)
         {
@@ -78,7 +77,7 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
+            // Resolve MethodInfo (Using Type.GetMethod for robustness).
             var __targetType = typeof(global::TestApp.DerivedService);
             var __paramTypes = new global::System.Type[]
             {

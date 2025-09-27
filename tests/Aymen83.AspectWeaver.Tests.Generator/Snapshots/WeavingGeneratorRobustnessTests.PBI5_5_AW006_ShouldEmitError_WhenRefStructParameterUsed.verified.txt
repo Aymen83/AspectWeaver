@@ -7,7 +7,7 @@
                     ^^^^^^^^^^^^^
         }
 */
- [ScrubbedPath]: (48,20)-(48,33),
+ [ScrubbedPath]: (44,20)-(44,33),
       Message: Method 'ProcessBuffer' cannot use aspects because it has a 'ref struct' parameter ('buffer'). Parameters like Span<T> or ReadOnlySpan<T> cannot be safely captured by the interception pipeline.,
       Severity: Error,
       Descriptor: {

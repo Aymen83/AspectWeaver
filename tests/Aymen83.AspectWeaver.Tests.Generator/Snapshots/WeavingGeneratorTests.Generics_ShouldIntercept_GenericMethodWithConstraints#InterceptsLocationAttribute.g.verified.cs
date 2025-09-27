@@ -25,7 +25,6 @@ namespace System.Runtime.CompilerServices
         /// <param name="character">The character position within the line of the invocation (1-based).</param>
         public InterceptsLocationAttribute(string filePath, int line, int character)
         {
-            // The compiler utilizes these parameters intrinsically; the body can be empty.
         }
     }
 }

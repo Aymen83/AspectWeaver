@@ -5,7 +5,6 @@
 
 #nullable enable
 
-// Suppress warnings for generated code.
 #pragma warning disable CS1591
 #pragma warning disable RS0016
 
@@ -18,54 +17,52 @@ namespace Aymen83.AspectWeaver.Generated
     [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 28, 34)]
+        [InterceptsLocation("[ScrubbedPath]", 27, 29)]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static int InterceptMethod0(this global::TestApp.MyService __instance, int input, string prefix = "A")
+        internal static global::TestApp.User InterceptMethod0(this global::TestApp.Repository<global::TestApp.User> __instance, int id)
         {
             // 1. Resolve IServiceProvider
             global::System.IServiceProvider __serviceProvider = __instance.ServiceProvider;
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // PBI 4.2: Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.MyService);
+            // Resolve MethodInfo (Using Type.GetMethod for robustness).
+            var __targetType = typeof(global::TestApp.Repository<global::TestApp.User>);
             var __paramTypes = new global::System.Type[]
             {
                 typeof(int),
-                typeof(string),
             };
-            var __methodInfo = __targetType.GetMethod("CalculateValue", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for CalculateValue. This indicates an issue in AspectWeaver.");
+            var __methodInfo = __targetType.GetMethod("GetById", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
+            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for GetById. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
-                { "input", input },
-                { "prefix", prefix },
+                { "id", id },
             };
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
                 methodInfo: __methodInfo,
-                methodName: "CalculateValue",
-                targetTypeName: "global::TestApp.MyService",
+                methodName: "GetById",
+                targetTypeName: "global::TestApp.Repository<global::TestApp.User>",
                 arguments: __arguments
             );
             
             // 3. Core: The original method call.
-            global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<int>> __pipeline = (ctx) =>
+            global::System.Func<global::Aymen83.AspectWeaver.Abstractions.InvocationContext, global::System.Threading.Tasks.ValueTask<global::TestApp.User>> __pipeline = (ctx) =>
             {
-                var result = __instance.CalculateValue(input, prefix);
-                return new global::System.Threading.Tasks.ValueTask<int>(result);
+                var result = __instance.GetById(id);
+                return new global::System.Threading.Tasks.ValueTask<global::TestApp.User>(result);
             };
             
             // 4. Wrapping: Apply aspects (from inner to outer).
-            // Aspect 0: global::MyTestAspectAttribute (Order=0)
+            // Aspect 0: global::GenericAspectAttribute (Order=0)
             var __next0 = __pipeline;
-            var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::MyTestAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::MyTestAspectAttribute>));
-            if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::MyTestAspectAttribute");
-            var __attribute0 = new global::MyTestAspectAttribute();
+            var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::GenericAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::GenericAspectAttribute>));
+            if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::GenericAspectAttribute");
+            var __attribute0 = new global::GenericAspectAttribute();
             __pipeline = (ctx) =>
             {
-                return __handler0.InterceptAsync<int>(__attribute0, ctx, __next0);
+                return __handler0.InterceptAsync<global::TestApp.User>(__attribute0, ctx, __next0);
             };
             
             // 5. Execute the pipeline.

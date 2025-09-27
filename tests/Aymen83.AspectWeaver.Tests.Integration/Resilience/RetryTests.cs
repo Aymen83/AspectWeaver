@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Resilience;
 
 public class RetryTests : IntegrationTestBase
 {
-    // Register the target service.
     protected override void ConfigureServices(IServiceCollection services)
     {
         // The RetryHandler is automatically registered by IntegrationTestBase assembly scanning.
@@ -13,7 +12,7 @@ public class RetryTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task PBI4_5_Async_SuccessOnFirstTry_ShouldNotRetry()
+    public async Task Async_SuccessOnFirstTry_ShouldNotRetry()
     {
         // Arrange
         var service = GetService<RetryTargetService>();
@@ -28,7 +27,7 @@ public class RetryTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task PBI4_5_Async_SuccessOnRetry_ShouldExecuteMultipleTimesAndRespectDelay()
+    public async Task Async_SuccessOnRetry_ShouldExecuteMultipleTimesAndRespectDelay()
     {
         // Arrange
         var service = GetService<RetryTargetService>();
@@ -48,7 +47,7 @@ public class RetryTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task PBI4_5_Async_FailureAfterExhaustion_ShouldThrowLastException()
+    public async Task Async_FailureAfterExhaustion_ShouldThrowLastException()
     {
         // Arrange
         var service = GetService<RetryTargetService>();
@@ -65,7 +64,7 @@ public class RetryTests : IntegrationTestBase
     }
 
     [Fact]
-    public void PBI4_5_Sync_SuccessOnRetry_ShouldRetry()
+    public void Sync_SuccessOnRetry_ShouldRetry()
     {
         // Arrange
         var service = GetService<RetryTargetService>();
@@ -80,7 +79,7 @@ public class RetryTests : IntegrationTestBase
     }
 
     [Fact]
-    public void PBI4_5_Sync_FailureAfterExhaustion_ShouldThrow()
+    public void Sync_FailureAfterExhaustion_ShouldThrow()
     {
         // Arrange
         var service = GetService<RetryTargetService>();
