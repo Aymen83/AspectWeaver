@@ -5,14 +5,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
+    <IsPackable>false</IsPackable>
     <Features>InterceptorsPreview</Features>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);Aymen83.AspectWeaver.Generated</InterceptorsNamespaces>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="C:\Users\aymen\source\repos\AspectWeaver\README.md" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Aymen83.AspectWeaver.Abstractions\Aymen83.AspectWeaver.Abstractions.csproj" />
