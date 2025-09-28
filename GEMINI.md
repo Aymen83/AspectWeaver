@@ -36,3 +36,16 @@ The project is built and tested using the .NET 8 SDK. The following commands can
 *   **Testing**: The project has a comprehensive test suite, including unit tests for the generator and integration tests for the aspects. The tests are located in the `tests` directory.
 *   **Dependency Injection**: The framework is designed to integrate with `Microsoft.Extensions.DependencyInjection`. Aspect handlers can have their own dependencies injected.
 *   **Immutability**: The `InvocationContext` and other core data structures are designed to be immutable to ensure thread safety.
+*   **Enabling Aspect Weaving**: To enable aspect weaving, you must add the generated namespace to the `InterceptorsNamespaces` property in your `.csproj` file:
+    ```xml
+    <PropertyGroup>
+      <InterceptorsNamespaces>$(InterceptorsNamespaces);Aymen83.AspectWeaver.Generated</InterceptorsNamespaces>
+    </PropertyGroup>
+    ```
+
+## Samples
+
+The solution includes two sample projects that demonstrate how to use the framework:
+
+*   **Aymen83.AspectWeaver.Sample.MinimalApi**: A minimal web API that uses the built-in aspects for logging, validation, and resilience.
+*   **Aymen83.AspectWeaver.Sample.CustomAspect**: A console application that shows how to create and use a custom aspect.

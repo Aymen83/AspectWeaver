@@ -95,10 +95,9 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.CloseBlock();
         }
 
-        private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptionLocation location)
+        private static void EmitInterceptsLocationAttribute(IndentedWriter writer, InterceptableLocation location)
         {
-            string filePathLiteral = SymbolDisplay.FormatLiteral(location.FilePath, true);
-            writer.WriteLine($"[InterceptsLocation({filePathLiteral}, {location.Line}, {location.Character})]");
+            writer.WriteLine($"[global::System.Runtime.CompilerServices.InterceptsLocation(version: {location.Version}, data: \"{location.Data}\")]");
         }
 
         private static void EmitPerformanceAttributes(IndentedWriter writer)

@@ -142,36 +142,5 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
             // 3. Fallback to absolute default if no explicit order or constant is defined.
             return 0;
         }
-
-        /// <summary>
-        /// Calculates the file path, line, and character for an interception location.
-        /// </summary>
-        public static InterceptionLocation CalculateIdentifierLocation(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
-        {
-            // Determine the syntax node representing the identifier being called.
-            SyntaxNode identifierNode = invocation.Expression switch
-            {
-                // e.g., myObject.MyMethod() or StaticClass.MyMethod()
-                MemberAccessExpressionSyntax memberAccess => memberAccess.Name,
-
-                // e.g., myObject?.MyMethod() (Conditional Access)
-                MemberBindingExpressionSyntax memberBinding => memberBinding.Name,
-
-                // Handles local calls, static calls, and generic calls (IdentifierNameSyntax or GenericNameSyntax)
-                _ => invocation.Expression
-            };
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var lineSpan = identifierNode.GetLocation().GetLineSpan();
-            var position = lineSpan.StartLinePosition;
-
-            // C# Interceptors require 1-based indexing. Roslyn provides 0-based indexing.
-            return new InterceptionLocation(
-                FilePath: lineSpan.Path,
-                Line: position.Line + 1,
-                Character: position.Character + 1
-            );
-        }
     }
 }

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <Features>InterceptorsPreview</Features>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Aymen83.AspectWeaver.Generated</InterceptorsNamespaces>
+    <AssemblyName>Aymen83.AspectWeaver.Sample.MinimalApi</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Aymen83.AspectWeaver.Abstractions\Aymen83.AspectWeaver.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Aymen83.AspectWeaver.Extensions\Aymen83.AspectWeaver.Extensions.csproj" />
+
+    <ProjectReference Include="..\..\src\Aymen83.AspectWeaver.Generator\Aymen83.AspectWeaver.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

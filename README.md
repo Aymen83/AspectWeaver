@@ -48,6 +48,16 @@ If you are compiling using the .NET 8 SDK, Interceptors are considered a **previ
 
 If you are compiling using the .NET 9 SDK or later, the `<Features>InterceptorsPreview</Features>` flag should **not** be required, as the feature is expected to be stable.
 
+## Enabling Aspect Weaving
+
+For the source generator to correctly weave the aspects, you must add the generated namespace to the `InterceptorsNamespaces` property in your `.csproj` file.
+
+```xml
+<PropertyGroup>
+  <InterceptorsNamespaces>$(InterceptorsNamespaces);Aymen83.AspectWeaver.Generated</InterceptorsNamespaces>
+</PropertyGroup>
+```
+
 ## Usage Guide
 
 ### 1. Define an Aspect

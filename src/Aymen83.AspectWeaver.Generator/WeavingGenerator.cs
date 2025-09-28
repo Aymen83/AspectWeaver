@@ -2,8 +2,10 @@ using Aymen83.AspectWeaver.Generator.Analysis;
 using Aymen83.AspectWeaver.Generator.Diagnostics;
 using Aymen83.AspectWeaver.Generator.Emitters;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Immutable;
 using System.Text;
 using System.Threading;
@@ -197,8 +199,12 @@ namespace Aymen83.AspectWeaver.Generator
             }
 
             // 6. Success: Calculate location and create the target.
-            var locationInfo = TargetAnalyzer.CalculateIdentifierLocation(invocation, token);
-            var target = new InterceptionTarget(methodSymbol, locationInfo, appliedAspects, providerAccessExpression);
+            InterceptableLocation? location = semanticModel.GetInterceptableLocation(invocation, token);
+            if (location is null)
+            {
+                throw new InvalidOperationException("Failed to determine the interception location.");
+            }
+            var target = new InterceptionTarget(methodSymbol, location, appliedAspects, providerAccessExpression);
             return (target, null);
         }
 

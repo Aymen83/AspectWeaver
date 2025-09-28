@@ -21,20 +21,18 @@ namespace System.Runtime.CompilerServices
     /// Allows a C# compiler to redirect an invocation to a different method (Interceptor).
     /// Note: This attribute must be defined internally as it is recognized intrinsically by the compiler.
     /// </summary>
+    [global::System.Diagnostics.Conditional("DEBUG")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     internal sealed class InterceptsLocationAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InterceptsLocationAttribute"/> class.
         /// </summary>
-        /// <param name="filePath">The path to the source file containing the invocation.</param>
-        /// <param name="line">The line number of the invocation (1-based).</param>
-        /// <param name="character">The character position within the line of the invocation (1-based).</param>
-        public InterceptsLocationAttribute(string filePath, int line, int character)
+        public InterceptsLocationAttribute(int version, string data)
         {
         }
     }
 }
-""" ;
+""";
     }
 }

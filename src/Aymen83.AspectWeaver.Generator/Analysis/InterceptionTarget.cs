@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 
 namespace Aymen83.AspectWeaver.Generator.Analysis
@@ -8,7 +9,7 @@ namespace Aymen83.AspectWeaver.Generator.Analysis
     /// </summary>
     internal sealed record InterceptionTarget(
         IMethodSymbol TargetMethod,
-        InterceptionLocation Location,
+        InterceptableLocation Location,
         ImmutableArray<AspectInfo> AppliedAspects,
         string ProviderAccessExpression
     );
