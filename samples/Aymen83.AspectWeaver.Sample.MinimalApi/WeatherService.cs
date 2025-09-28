@@ -1,17 +1,11 @@
 ﻿namespace Aymen83.AspectWeaver.Sample.MinimalApi;
 
-public class WeatherService : IWeatherService
+public class WeatherService(IServiceProvider serviceProvider) : IWeatherService
 {
     // Implement the IServiceProvider requirement
-    public IServiceProvider ServiceProvider { get; }
+    public IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     private int _attemptCount = 0;
-
-    // Inject the provider via the constructor
-    public WeatherService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
 
     public Task<string> GetWeatherAsync(string city)
     {

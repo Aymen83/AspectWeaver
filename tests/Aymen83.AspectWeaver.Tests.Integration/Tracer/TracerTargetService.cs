@@ -1,14 +1,9 @@
 namespace Aymen83.AspectWeaver.Tests.Integration.Tracer;
 
-public class TracerTargetService
+public class TracerTargetService(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider to enable DI for aspects.
-    internal IServiceProvider ServiceProvider { get; } = null!;
-
-    public TracerTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     [Tracer]
     public virtual int Calculate(int a, int b)

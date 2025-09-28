@@ -17,7 +17,7 @@ namespace Aymen83.AspectWeaver.Generated
     [global::System.Diagnostics.DebuggerNonUserCode]
     internal static class Interceptors
     {
-        [InterceptsLocation("[ScrubbedPath]", 46, 27)]
+        [global::System.Runtime.CompilerServices.InterceptsLocation(version: 1, data: "NiKdiPDobyISQaPLyvIyWKQFAABTaW11bGF0ZWRTb3VyY2UuY3M=")]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static async global::System.Threading.Tasks.Task<bool> InterceptMethod0(this global::TestApp.DerivedService __instance)
         {
@@ -69,7 +69,7 @@ namespace Aymen83.AspectWeaver.Generated
             return __finalResult;
         }
         
-        [InterceptsLocation("[ScrubbedPath]", 50, 27)]
+        [global::System.Runtime.CompilerServices.InterceptsLocation(version: 1, data: "NiKdiPDobyISQaPLyvIyWEcGAABTaW11bGF0ZWRTb3VyY2UuY3M=")]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static async global::System.Threading.Tasks.Task<bool> InterceptMethod1(this global::TestApp.BaseService __instance)
         {

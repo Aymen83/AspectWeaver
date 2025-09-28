@@ -1,14 +1,9 @@
 ﻿namespace Aymen83.AspectWeaver.Sample.CustomAspect;
 
-public class DataRepository
+public class DataRepository(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider (AW001 requirement)
-    internal IServiceProvider ServiceProvider { get; }
-
-    public DataRepository(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     // Apply the custom aspect
     [Cache(DurationSeconds = 10)]

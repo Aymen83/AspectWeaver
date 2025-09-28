@@ -3,15 +3,10 @@ using Aymen83.AspectWeaver.Extensions.Validation;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Validation;
 
-public class ValidationTargetService
+public class ValidationTargetService(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider for the weaver to resolve aspect handlers.
-    internal IServiceProvider ServiceProvider { get; } = null!;
-
-    public ValidationTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     // This property is used by tests to verify if the method body was executed.
     public bool WasExecuted { get; private set; }

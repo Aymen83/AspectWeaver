@@ -12,14 +12,9 @@ public class TracerAttribute : AspectAttribute { }
 /// Handles the logic for the <see cref="TracerAttribute"/>.
 /// This will be registered by IntegrationTestBase via assembly scanning.
 /// </summary>
-public class TracerHandler : IAspectHandler<TracerAttribute>
+public class TracerHandler(ITracerMock mock) : IAspectHandler<TracerAttribute>
 {
-    private readonly ITracerMock _mock;
-
-    public TracerHandler(ITracerMock mock)
-    {
-        _mock = mock;
-    }
+    private readonly ITracerMock _mock = mock;
 
     public async ValueTask<TResult> InterceptAsync<TResult>(TracerAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
     {

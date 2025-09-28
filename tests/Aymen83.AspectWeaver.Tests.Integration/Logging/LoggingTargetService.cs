@@ -3,15 +3,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Logging;
 
-public class LoggingTargetService
+public class LoggingTargetService(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider to enable DI for aspects.
-    internal IServiceProvider ServiceProvider { get; } = null!;
-
-    public LoggingTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     [LogExecution(Level = LogLevel.Information, LogArguments = true, LogReturnValue = true)]
     public virtual int SyncMethod(int input)

@@ -2,15 +2,10 @@ using Aymen83.AspectWeaver.Extensions.Resilience;
 
 namespace Aymen83.AspectWeaver.Tests.Integration.Resilience;
 
-public class RetryTargetService
+public class RetryTargetService(IServiceProvider serviceProvider)
 {
     // Expose IServiceProvider for the weaver to resolve aspect handlers.
-    internal IServiceProvider ServiceProvider { get; } = null!;
-
-    public RetryTargetService(IServiceProvider serviceProvider)
-    {
-        ServiceProvider = serviceProvider;
-    }
+    internal IServiceProvider ServiceProvider { get; } = serviceProvider;
 
     /// <summary>
     /// Tracks the number of times the method body has started execution.

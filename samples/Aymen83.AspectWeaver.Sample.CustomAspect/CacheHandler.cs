@@ -4,15 +4,9 @@ using System.Text;
 
 namespace Aymen83.AspectWeaver.Sample.CustomAspect;
 
-public class CacheHandler : IAspectHandler<CacheAttribute>
+public class CacheHandler(IMemoryCache cache) : IAspectHandler<CacheAttribute>
 {
-    private readonly IMemoryCache _cache;
-
-    // Inject IMemoryCache via DI (Demonstrates Epic 3 capabilities)
-    public CacheHandler(IMemoryCache cache)
-    {
-        _cache = cache;
-    }
+    private readonly IMemoryCache _cache = cache;
 
     public async ValueTask<TResult> InterceptAsync<TResult>(CacheAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
     {

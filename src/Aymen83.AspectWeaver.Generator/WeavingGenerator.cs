@@ -199,11 +199,7 @@ namespace Aymen83.AspectWeaver.Generator
             }
 
             // 6. Success: Calculate location and create the target.
-            InterceptableLocation? location = semanticModel.GetInterceptableLocation(invocation, token);
-            if (location is null)
-            {
-                throw new InvalidOperationException("Failed to determine the interception location.");
-            }
+            InterceptableLocation? location = semanticModel.GetInterceptableLocation(invocation, token) ?? throw new InvalidOperationException("Failed to determine the interception location.");
             var target = new InterceptionTarget(methodSymbol, location, appliedAspects, providerAccessExpression);
             return (target, null);
         }
