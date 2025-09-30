@@ -4,48 +4,51 @@ using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Aymen83.AspectWeaver.Tests.Generator;
 
-public static class GeneratorTestHelper
+public static partial class GeneratorTestHelper
 {
     private static readonly CSharpParseOptions ParseOptions = new(LanguageVersion.CSharp12);
     private static readonly IEnumerable<MetadataReference> References = LoadReferences();
     private const string MockFilePath = @"SimulatedSource.cs";
 
     /// <summary>
-    /// Verifies the output of the WeavingGenerator for a given source code.
+    /// Compiles the given source code, runs the <see cref="WeavingGenerator"/>,
+    /// and verifies the output using snapshot testing.
     /// </summary>
     /// <param name="sourceCode">The C# source code to compile and generate from.</param>
-    /// <param name="expectedDiagnosticIds">An array of diagnostic IDs that are expected to be reported.</param>
+    /// <param name="expectedDiagnosticIds">An array of diagnostic IDs that are expected to be reported by the generator.</param>
     public static Task Verify(string sourceCode, params string[] expectedDiagnosticIds)
     {
-        // 1. Create the compilation object.
+        // Create a Roslyn compilation from the source code.
         var compilation = CreateCompilation(sourceCode);
 
-        // 2. Check for input diagnostics.
+        // Check for compilation errors in the input source code.
+        // We only throw if input errors exist AND we didn't expect any diagnostics from the generator,
+        // as input errors can cause cascading failures in the generator.
         var inputDiagnostics = compilation.GetDiagnostics();
-        // We only throw if input errors exist AND we didn't expect any diagnostics from the generator (as input errors might cascade).
         if (expectedDiagnosticIds.Length == 0 && inputDiagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
         {
             throw new InvalidOperationException("Input compilation has errors. Generator results are unreliable.\n" + string.Join("\n", inputDiagnostics));
         }
 
+        // Set up the generator driver.
         var generator = new WeavingGenerator().AsSourceGenerator();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
             generators: [generator],
             parseOptions: ParseOptions);
 
-        // 5. Run the generator.
+        // Run the generator and get the results.
         driver = driver.RunGenerators(compilation);
-
-        // 6. Check for diagnostics produced during or after generation.
         var runResult = driver.GetRunResult();
         var generatedTrees = runResult.GeneratedTrees.ToArray();
-        // Combine all diagnostics (Generator execution + Generated code compilation).
+
+        // Combine diagnostics from both the generator execution and the compilation of generated code.
         var allDiagnostics = runResult.Diagnostics.Concat(generatedTrees.SelectMany(t => t.GetDiagnostics())).ToList();
 
-        // Validate expected diagnostics.
+        // Validate that the reported diagnostics match the expected ones.
         var actualDiagnosticIds = allDiagnostics.Select(d => d.Id).ToHashSet();
 
         if (expectedDiagnosticIds.Length > 0)
@@ -73,21 +76,42 @@ public static class GeneratorTestHelper
         }
 
 
-        // 7. Use Verify to assert the results (Snapshots the generated code).
+        // Use Verify to snapshot the generated code and diagnostics.
+        // Scrubbers are used to remove machine-specific or run-specific data.
         return Verifier.Verify(driver)
+            .AddScrubber(ScrubData)
             .AddScrubber(builder => ScrubFilePath(builder, MockFilePath))
             .UseDirectory("Snapshots");
     }
 
+    /// <summary>
+    /// Scrubs the mock file path from the snapshot output to ensure test consistency across different environments.
+    /// It replaces both the raw path and the escaped path literal used in the generated code.
+    /// </summary>
     private static void ScrubFilePath(StringBuilder builder, string filePath)
     {
-        // Scrub the raw path (in case Verify snapshots diagnostic messages)
+        // Scrub the raw path (e.g., in diagnostic messages).
         builder.Replace(filePath, "[ScrubbedPath]");
-        // Scrub the escaped literal (for generated code)
+        // Scrub the escaped literal (e.g., in a C# string literal in generated code).
         var escapedFilePathLiteral = SymbolDisplay.FormatLiteral(filePath, true);
         builder.Replace(escapedFilePathLiteral, "\"[ScrubbedPath]\"");
     }
 
+    /// <summary>
+    /// Scrubs the 'data' parameter from the InterceptsLocationAttribute in the snapshot output.
+    /// This is necessary because the data is a hash that can change between runs, which would break snapshot tests.
+    /// </summary>
+    private static void ScrubData(StringBuilder builder)
+    {
+        string input = builder.ToString();
+        string newInput = InterceptsLocationAttributeRegex().Replace(input, "[global::System.Runtime.CompilerServices.InterceptsLocation(version: 1, data: \"[ScrubbedData]\")]");
+        builder.Clear();
+        builder.Append(newInput);
+    }
+
+    /// <summary>
+    /// Creates a C# compilation from a source string, configured with the necessary options and references for the generator tests.
+    /// </summary>
     private static CSharpCompilation CreateCompilation(string source)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(source, ParseOptions, path: MockFilePath);
@@ -102,12 +126,24 @@ public static class GeneratorTestHelper
             options: options);
     }
 
+    /// <summary>
+    // Loads the required metadata references for the test compilation,
+    /// including .NET 8 reference assemblies and the project's own abstractions assembly.
+    /// </summary>
     private static List<MetadataReference> LoadReferences()
     {
         var references = new List<MetadataReference>(Net80.References.All)
         {
+            // Add a reference to the assembly containing the aspect attributes.
             MetadataReference.CreateFromFile(typeof(AspectAttribute).Assembly.Location)
         };
         return references;
     }
+
+    /// <summary>
+    /// A regular expression to find and scrub the 'data' parameter of the InterceptsLocationAttribute.
+    /// The 'data' parameter contains a hash that is not stable across builds.
+    /// </summary>
+    [GeneratedRegex("\\[global::System\\.Runtime\\.CompilerServices\\.InterceptsLocation\\(version: 1, data: \"[a-zA-Z\\d\\+/=]+\"\\)\\]")]
+    private static partial Regex InterceptsLocationAttributeRegex();
 }
