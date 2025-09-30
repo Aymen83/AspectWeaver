@@ -2,16 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    
+
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-	<AssemblyName>Aymen83.AspectWeaver.Generator</AssemblyName>
+    <AssemblyName>Aymen83.AspectWeaver.Generator</AssemblyName>
     <RootNamespace>Aymen83.AspectWeaver.Generator</RootNamespace>
     <IsPackable>true</IsPackable>
     <PackageId>Aymen83.AspectWeaver</PackageId>
     <Description>The core AspectWeaver AOP framework engine. A high-performance source generator utilizing C# 12 Interceptors to weave aspects into your .NET applications.</Description>
     <PackageTags>AOP, AspectWeaver, Interception, Source Generator, Analyzer, Roslyn, CSharp12</PackageTags>
 
-    
+    <!-- This is a Roslyn Analyzer / Source Generator -->
+    <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
+
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
