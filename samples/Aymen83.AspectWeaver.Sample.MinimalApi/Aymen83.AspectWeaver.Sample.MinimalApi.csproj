@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,6 +8,7 @@
     <Features>InterceptorsPreview</Features>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);Aymen83.AspectWeaver.Generated</InterceptorsNamespaces>
     <AssemblyName>Aymen83.AspectWeaver.Sample.MinimalApi</AssemblyName>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

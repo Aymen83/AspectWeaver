@@ -8,7 +8,7 @@
 
   <!-- NuGet Packaging Properties -->
   <PropertyGroup>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.2</PackageVersion>
     <Authors>Aymen Kammoun</Authors>
     <Company>Aymen83</Company>
     <Copyright>Copyright (c) Aymen83 2025</Copyright>

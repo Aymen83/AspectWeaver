@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "�
 		icon.png = icon.png
 		LICENSE = LICENSE
 		README.md = README.md
+		RELEASENOTES.md = RELEASENOTES.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aymen83.AspectWeaver.Tests.Generator", "tests\Aymen83.AspectWeaver.Tests.Generator\Aymen83.AspectWeaver.Tests.Generator.csproj", "{201E9DF6-FD77-4770-BA85-2AE982BBC7CE}"
