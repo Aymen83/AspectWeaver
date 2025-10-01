@@ -27,12 +27,7 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
-            {
-                { "input", input },
-                { "value", value },
-                { "initialized", initialized },
-            };
+            var __arguments = new Interceptor0_Cache.ArgumentsStruct(input, value, initialized);
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
@@ -70,6 +65,39 @@ namespace Aymen83.AspectWeaver.Generated
         [global::System.Diagnostics.DebuggerNonUserCode]
         private static class Interceptor0_Cache
         {
+            public readonly struct ArgumentsStruct : global::Aymen83.AspectWeaver.Abstractions.IArgumentsContainer
+            {
+                private readonly global::System.String _input;
+                private readonly global::System.Int32 _value;
+                private readonly global::System.Boolean _initialized;
+                
+                public ArgumentsStruct(global::System.String input, global::System.Int32 value, global::System.Boolean initialized)
+                {
+                    _input = input;
+                    _value = value;
+                    _initialized = initialized;
+                }
+                
+                public int Count => 3;
+                
+                public object? this[string parameterName] => parameterName switch
+                {
+                    "input" => _input,
+                    "value" => _value,
+                    "initialized" => _initialized,
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(parameterName), $"Parameter '{parameterName}' not found.")
+                };
+                
+                public global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, object?>> GetEnumerator()
+                {
+                    yield return new global::System.Collections.Generic.KeyValuePair<string, object?>("input", _input);
+                    yield return new global::System.Collections.Generic.KeyValuePair<string, object?>("value", _value);
+                    yield return new global::System.Collections.Generic.KeyValuePair<string, object?>("initialized", _initialized);
+                }
+                
+                global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+            }
+            
             internal static readonly MethodInfo MethodInfo = InitMethodInfo();
             
             internal static readonly global::RefOutAspectAttribute Attribute_0 = InitAttribute_0();

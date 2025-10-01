@@ -89,13 +89,18 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.WriteLine($"private static class {cacheClassName}");
             writer.OpenBlock();
 
-            // 1. The cached static field, initialized via the InitMethodInfo method.
+            // 1. Generate the Argument Struct definition.
+            // It must be defined before being used by the interceptor method logic (via PipelineEmitter).
+            ArgumentStructEmitter.Emit(writer, target.TargetMethod);
+            writer.WriteLine();
+
+            // 2. The cached static field, initialized via the InitMethodInfo method.
             EmitCachedMethodInfoField(writer);
 
-            // 2. Attribute caching
+            // 3. Attribute caching
             EmitAttributeCache(writer, target);
 
-            // 3. The initialization method (runs once per type).
+            // 4. The initialization method (runs once per type).
             EmitInitializationMethod(writer, target);
 
             writer.CloseBlock();

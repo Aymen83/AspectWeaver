@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Aymen83.AspectWeaver.Abstractions
@@ -23,7 +22,7 @@ namespace Aymen83.AspectWeaver.Abstractions
         MethodInfo methodInfo,
         string methodName,
         string targetTypeName,
-        IReadOnlyDictionary<string, object?> arguments)
+        IArgumentsContainer arguments)
     {
         /// <summary>
         /// Gets the instance of the object on which the method is being invoked.
@@ -51,7 +50,7 @@ namespace Aymen83.AspectWeaver.Abstractions
         /// <summary>
         /// Gets a read-only dictionary containing the arguments passed to the intercepted method.
         /// </summary>
-        public IReadOnlyDictionary<string, object?> Arguments { get; } = arguments ?? throw new ArgumentNullException(nameof(arguments));
+        public IArgumentsContainer Arguments { get; } = arguments ?? throw new ArgumentNullException(nameof(arguments));
 
         /// <summary>
         /// Gets the <see cref="System.Reflection.MethodInfo"/> representing the intercepted method.

@@ -40,7 +40,7 @@ public class TracerTests : IntegrationTestBase
         Assert.Equal(15, result);
 
         // Verify that the mock was called correctly by the aspect handler.
-        _tracerMock.Verify(m => m.Trace("Before Calculate"), Times.Once);
+        _tracerMock.Verify(m => m.Trace("Before Calculate (Args: 2)"), Times.Once);
         _tracerMock.Verify(m => m.Trace("After Calculate"), Times.Once);
         _tracerMock.VerifyNoOtherCalls();
     }
@@ -58,7 +58,7 @@ public class TracerTests : IntegrationTestBase
         Assert.Equal("Data for test_key", result);
 
         // Verify
-        _tracerMock.Verify(m => m.Trace("Before FetchDataAsync"), Times.Once);
+        _tracerMock.Verify(m => m.Trace("Before FetchDataAsync (Args: 1)"), Times.Once);
         _tracerMock.Verify(m => m.Trace("After FetchDataAsync"), Times.Once);
         _tracerMock.VerifyNoOtherCalls();
     }
@@ -74,7 +74,7 @@ public class TracerTests : IntegrationTestBase
         Assert.Equal("Simulated failure", exception.Message);
 
         // Verify
-        _tracerMock.Verify(m => m.Trace("Before FetchDataAsync"), Times.Once);
+        _tracerMock.Verify(m => m.Trace("Before FetchDataAsync (Args: 1)"), Times.Once);
         // Ensure the exception path was traced.
         _tracerMock.Verify(m => m.Trace("Exception in FetchDataAsync: Simulated failure"), Times.Once);
         // Ensure the success path was NOT traced.

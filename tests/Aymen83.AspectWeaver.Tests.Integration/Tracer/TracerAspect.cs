@@ -18,7 +18,8 @@ public class TracerHandler(ITracerMock mock) : IAspectHandler<TracerAttribute>
 
     public async ValueTask<TResult> InterceptAsync<TResult>(TracerAttribute attribute, InvocationContext context, Func<InvocationContext, ValueTask<TResult>> next)
     {
-        _mock.Trace($"Before {context.MethodName}");
+        var argCount = context.Arguments.Count;
+        _mock.Trace($"Before {context.MethodName} (Args: {argCount})");
         try
         {
             var result = await next(context).ConfigureAwait(false);

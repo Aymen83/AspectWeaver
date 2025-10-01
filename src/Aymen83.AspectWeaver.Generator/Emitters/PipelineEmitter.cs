@@ -13,7 +13,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         private const string FuncType = "global::System.Func";
         private const string ValueTaskType = "global::System.Threading.Tasks.ValueTask";
         private const string InvocationContextType = "global::Aymen83.AspectWeaver.Abstractions.InvocationContext";
-        private const string DictionaryType = "global::System.Collections.Generic.Dictionary";
         private const string IServiceProviderType = "global::System.IServiceProvider";
         private const string AspectHandlerType = "global::Aymen83.AspectWeaver.Abstractions.IAspectHandler";
         private const string InvalidOperationExceptionType = "global::System.InvalidOperationException";
@@ -30,12 +29,9 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             // 1. Resolve IServiceProvider
             EmitServiceProviderResolution(writer, target);
 
-            // Construct the access expression for the cached MethodInfo.
-            var cachedMethodInfoAccessExpression = $"{cacheClassName}.{InterceptorEmitter.CachedMethodInfoFieldName}";
-
             // 2. Create InvocationContext
             string targetInstanceExpression = signature.IsInstanceMethod ? MethodSignature.InstanceParameterName : "null";
-            EmitInvocationContext(writer, target, targetInstanceExpression, cachedMethodInfoAccessExpression);
+            EmitInvocationContext(writer, target, targetInstanceExpression, cacheClassName);
 
             // 3. Define the Core Delegate
             EmitCoreDelegate(writer, target, signature, delegateType);
@@ -66,20 +62,19 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         #endregion
 
         #region Step 2: Invocation Context
-        private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression, string cachedMethodInfoAccessExpression)
+        private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression, string cacheClassName)
         {
             var method = target.TargetMethod;
             writer.WriteLine($"// 2. Create InvocationContext");
 
-            // 2.2. Pack Arguments
-            writer.WriteLine($"var __arguments = new {DictionaryType}<string, object?>()");
-            writer.OpenBlock();
-            foreach (var param in method.Parameters)
-            {
-                var paramNameLiteral = SymbolDisplay.FormatLiteral(param.Name, true);
-                writer.WriteLine($"{{ {paramNameLiteral}, {param.Name} }},");
-            }
-            writer.CloseBlock(suffix: ";");
+            // 2.2. Pack Arguments (Using specialized struct).
+            // Example: var __arguments = new Interceptor0_Cache.ArgumentsStruct(param1, param2);
+            var structType = $"{cacheClassName}.{ArgumentStructEmitter.StructName}";
+            // Generate the argument list from the parameters passed to the interceptor method.
+            // We must only pass the names, not the modifiers (ref/out/in).
+            var argumentsList = string.Join(", ", method.Parameters.Select(p => p.Name));
+            writer.WriteLine($"var __arguments = new {structType}({argumentsList});");
+
 
             // 2.3. Create Context
             var typeName = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
@@ -87,6 +82,8 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             string methodNameLiteral = SymbolDisplay.FormatLiteral(method.Name, true);
             string typeNameLiteral = SymbolDisplay.FormatLiteral(typeName, true);
 
+            // Construct the access expression for the cached MethodInfo.
+            var cachedMethodInfoAccessExpression = $"{cacheClassName}.{InterceptorEmitter.CachedMethodInfoFieldName}";
 
             writer.WriteLine($"var {ContextVar} = new {InvocationContextType}(");
             writer.Indent();
