@@ -10,6 +10,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Aymen83.AspectWeaver.Generated
 {
@@ -26,19 +27,6 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.UtilityService);
-            var __paramTypes = new global::System.Type[]
-            {
-                typeof(T),
-            };
-            var __genericMethodDefinition = __targetType.GetMethod("Echo", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__genericMethodDefinition == null) throw new global::System.InvalidOperationException("Could not resolve Generic Method Definition for Echo. This indicates an issue in AspectWeaver.");
-            var __genericArgs = new global::System.Type[]
-            {
-                typeof(T),
-            };
-            var __methodInfo = __genericMethodDefinition.MakeGenericMethod(__genericArgs);
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
                 { "input", input },
@@ -46,7 +34,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
-                methodInfo: __methodInfo,
+                methodInfo: Interceptor0_Cache.MethodInfo,
                 methodName: "Echo",
                 targetTypeName: "global::TestApp.UtilityService",
                 arguments: __arguments
@@ -74,6 +62,30 @@ namespace Aymen83.AspectWeaver.Generated
             // Execution Mode: Synchronous.
             var __finalResult = __pipeline(__context).GetAwaiter().GetResult();
             return __finalResult;
+        }
+        
+        [global::System.Diagnostics.DebuggerStepThrough]
+        [global::System.Diagnostics.DebuggerNonUserCode]
+        private static class Interceptor0_Cache
+        {
+            internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            private static MethodInfo InitMethodInfo()
+            {
+                var __targetType = typeof(global::TestApp.UtilityService);
+                var __paramTypes = new global::System.Type[]
+                {
+                    typeof(T),
+                };
+                var __genericMethodDefinition = __targetType.GetMethod("Echo", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, __paramTypes, null);
+                if (__genericMethodDefinition == null) throw new global::System.InvalidOperationException("Could not resolve Generic Method Definition for Echo during initialization.");
+                var __genericArgs = new global::System.Type[]
+                {
+                    typeof(T),
+                };
+                return __genericMethodDefinition.MakeGenericMethod(__genericArgs);
+            }
+            
         }
     }
 }

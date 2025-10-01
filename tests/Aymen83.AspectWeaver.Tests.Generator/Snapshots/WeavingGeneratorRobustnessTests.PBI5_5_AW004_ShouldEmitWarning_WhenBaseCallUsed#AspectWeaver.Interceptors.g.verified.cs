@@ -10,6 +10,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Aymen83.AspectWeaver.Generated
 {
@@ -26,20 +27,13 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.DerivedService);
-            var __paramTypes = new global::System.Type[]
-            {
-            };
-            var __methodInfo = __targetType.GetMethod("Helper", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for Helper. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
             };
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
-                methodInfo: __methodInfo,
+                methodInfo: Interceptor0_Cache.MethodInfo,
                 methodName: "Helper",
                 targetTypeName: "global::TestApp.DerivedService",
                 arguments: __arguments
@@ -68,6 +62,25 @@ namespace Aymen83.AspectWeaver.Generated
             var __finalResult = __pipeline(__context).GetAwaiter().GetResult();
         }
         
+        [global::System.Diagnostics.DebuggerStepThrough]
+        [global::System.Diagnostics.DebuggerNonUserCode]
+        private static class Interceptor0_Cache
+        {
+            internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            private static MethodInfo InitMethodInfo()
+            {
+                var __targetType = typeof(global::TestApp.DerivedService);
+                var __paramTypes = new global::System.Type[]
+                {
+                };
+                var methodInfo = __targetType.GetMethod("Helper", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, __paramTypes, null);
+                if (methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for Helper during initialization.");
+                return methodInfo;
+            }
+            
+        }
+        
         [global::System.Runtime.CompilerServices.InterceptsLocation(version: 1, data: "[ScrubbedData]")]
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static void InterceptMethod1(this global::TestApp.DerivedService __instance)
@@ -77,20 +90,13 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.DerivedService);
-            var __paramTypes = new global::System.Type[]
-            {
-            };
-            var __methodInfo = __targetType.GetMethod("Execute", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for Execute. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
             };
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
-                methodInfo: __methodInfo,
+                methodInfo: Interceptor1_Cache.MethodInfo,
                 methodName: "Execute",
                 targetTypeName: "global::TestApp.DerivedService",
                 arguments: __arguments
@@ -117,6 +123,25 @@ namespace Aymen83.AspectWeaver.Generated
             // 5. Execute the pipeline.
             // Execution Mode: Synchronous.
             var __finalResult = __pipeline(__context).GetAwaiter().GetResult();
+        }
+        
+        [global::System.Diagnostics.DebuggerStepThrough]
+        [global::System.Diagnostics.DebuggerNonUserCode]
+        private static class Interceptor1_Cache
+        {
+            internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            private static MethodInfo InitMethodInfo()
+            {
+                var __targetType = typeof(global::TestApp.DerivedService);
+                var __paramTypes = new global::System.Type[]
+                {
+                };
+                var methodInfo = __targetType.GetMethod("Execute", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, __paramTypes, null);
+                if (methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for Execute during initialization.");
+                return methodInfo;
+            }
+            
         }
     }
 }

@@ -10,6 +10,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Aymen83.AspectWeaver.Generated
 {
@@ -26,20 +27,13 @@ namespace Aymen83.AspectWeaver.Generated
             if (__serviceProvider == null) throw new global::System.InvalidOperationException("The IServiceProvider accessed via '__instance.ServiceProvider' returned null. Ensure the provider is correctly initialized on the instance.");
             
             // 2. Create InvocationContext
-            // Resolve MethodInfo (Using Type.GetMethod for robustness).
-            var __targetType = typeof(global::TestApp.OuterClass.NestedStatic.DeeplyNestedInstance);
-            var __paramTypes = new global::System.Type[]
-            {
-            };
-            var __methodInfo = __targetType.GetMethod("GetName", global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance, null, __paramTypes, null);
-            if (__methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for GetName. This indicates an issue in AspectWeaver.");
             var __arguments = new global::System.Collections.Generic.Dictionary<string, object?>()
             {
             };
             var __context = new global::Aymen83.AspectWeaver.Abstractions.InvocationContext(
                 targetInstance: __instance,
                 serviceProvider: __serviceProvider,
-                methodInfo: __methodInfo,
+                methodInfo: Interceptor0_Cache.MethodInfo,
                 methodName: "GetName",
                 targetTypeName: "global::TestApp.OuterClass.NestedStatic.DeeplyNestedInstance",
                 arguments: __arguments
@@ -67,6 +61,25 @@ namespace Aymen83.AspectWeaver.Generated
             // Execution Mode: Synchronous.
             var __finalResult = __pipeline(__context).GetAwaiter().GetResult();
             return __finalResult;
+        }
+        
+        [global::System.Diagnostics.DebuggerStepThrough]
+        [global::System.Diagnostics.DebuggerNonUserCode]
+        private static class Interceptor0_Cache
+        {
+            internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            private static MethodInfo InitMethodInfo()
+            {
+                var __targetType = typeof(global::TestApp.OuterClass.NestedStatic.DeeplyNestedInstance);
+                var __paramTypes = new global::System.Type[]
+                {
+                };
+                var methodInfo = __targetType.GetMethod("GetName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, __paramTypes, null);
+                if (methodInfo == null) throw new global::System.InvalidOperationException("Could not resolve MethodInfo for GetName during initialization.");
+                return methodInfo;
+            }
+            
         }
     }
 }

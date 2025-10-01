@@ -22,9 +22,8 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         private const string ContextVar = "__context";
         private const string PipelineVar = "__pipeline";
         private const string ServiceProviderVar = "__serviceProvider";
-        private const string MethodInfoVar = "__methodInfo";
 
-        public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
+        public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string cachedMethodInfoAccessExpression)
         {
             var delegateType = $"{FuncType}<{InvocationContextType}, {ValueTaskType}<{signature.LogicalResultType}>>";
 
@@ -33,7 +32,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
 
             // 2. Create InvocationContext
             string targetInstanceExpression = signature.IsInstanceMethod ? MethodSignature.InstanceParameterName : "null";
-            EmitInvocationContext(writer, target, targetInstanceExpression);
+            EmitInvocationContext(writer, target, targetInstanceExpression, cachedMethodInfoAccessExpression);
 
             // 3. Define the Core Delegate
             EmitCoreDelegate(writer, target, signature, delegateType);
@@ -64,13 +63,10 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         #endregion
 
         #region Step 2: Invocation Context
-        private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression)
+        private static void EmitInvocationContext(IndentedWriter writer, InterceptionTarget target, string targetInstanceExpression, string cachedMethodInfoAccessExpression)
         {
             var method = target.TargetMethod;
             writer.WriteLine($"// 2. Create InvocationContext");
-
-            // 2.1. Retrieve MethodInfo
-            EmitMethodInfoRetrieval(writer, target);
 
             // 2.2. Pack Arguments
             writer.WriteLine($"var __arguments = new {DictionaryType}<string, object?>()");
@@ -93,84 +89,13 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.Indent();
             writer.WriteLine($"targetInstance: {targetInstanceExpression},");
             writer.WriteLine($"serviceProvider: {ServiceProviderVar},");
-            writer.WriteLine($"methodInfo: {MethodInfoVar},");
+            writer.WriteLine($"methodInfo: {cachedMethodInfoAccessExpression},");
             writer.WriteLine($"methodName: {methodNameLiteral},");
             writer.WriteLine($"targetTypeName: {typeNameLiteral},");
             writer.WriteLine($"arguments: __arguments");
             writer.Outdent();
             writer.WriteLine(");");
             writer.WriteLine();
-        }
-
-        // Helper to generate the MethodInfo retrieval logic using Type.GetMethod().
-        private static void EmitMethodInfoRetrieval(IndentedWriter writer, InterceptionTarget target)
-        {
-            writer.WriteLine("// Resolve MethodInfo (Using Type.GetMethod for robustness).");
-
-            var method = target.TargetMethod;
-
-            // 1. Get the Type object of the containing type.
-            var containingTypeFQN = method.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
-            writer.WriteLine($"var __targetType = typeof({containingTypeFQN});");
-
-            // 2. Define the parameter types array for the specific overload.
-            writer.WriteLine("var __paramTypes = new global::System.Type[]");
-            writer.OpenBlock();
-            foreach (var p in method.Parameters)
-            {
-                var paramTypeFQN = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
-                // Handle ref/out parameters correctly for reflection lookup.
-                if (p.RefKind != RefKind.None)
-                {
-                    // typeof(T).MakeByRefType() is required for matching ref/out parameters.
-                    writer.WriteLine($"typeof({paramTypeFQN}).MakeByRefType(),");
-                }
-                else
-                {
-                    writer.WriteLine($"typeof({paramTypeFQN}),");
-                }
-            }
-            writer.CloseBlock(";");
-
-            // 3. Call GetMethod().
-            var methodNameLiteral = SymbolDisplay.FormatLiteral(method.Name, true);
-            // Define binding flags (Public/NonPublic, Instance/Static).
-            string bindingFlags = "global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | ";
-            bindingFlags += method.IsStatic ? "global::System.Reflection.BindingFlags.Static" : "global::System.Reflection.BindingFlags.Instance";
-
-            // Handle Generic Methods: If generic, we first get the generic definition, then specialize it.
-            if (method.IsGenericMethod)
-            {
-                // GetMethod on a generic type returns the Generic Method Definition when called with the correct parameter types.
-                writer.WriteLine($"var __genericMethodDefinition = __targetType.GetMethod({methodNameLiteral}, {bindingFlags}, null, __paramTypes, null);");
-
-                // Safety check for the definition.
-                var exceptionMsgDef = SymbolDisplay.FormatLiteral($"Could not resolve Generic Method Definition for {method.Name}. This indicates an issue in AspectWeaver.", true);
-                writer.WriteLine($"if (__genericMethodDefinition == null) throw new {InvalidOperationExceptionType}({exceptionMsgDef});");
-
-
-                // Generate the specialization types array (TypeArguments used at the call site).
-                writer.WriteLine("var __genericArgs = new global::System.Type[]");
-                writer.OpenBlock();
-                foreach (var typeArg in method.TypeArguments)
-                {
-                    var typeArgFQN = typeArg.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
-                    writer.WriteLine($"typeof({typeArgFQN}),");
-                }
-                writer.CloseBlock(";");
-
-                // Specialize the method.
-                writer.WriteLine($"var {MethodInfoVar} = __genericMethodDefinition.MakeGenericMethod(__genericArgs);");
-            }
-            else
-            {
-                // Non-generic method call.
-                writer.WriteLine($"var {MethodInfoVar} = __targetType.GetMethod({methodNameLiteral}, {bindingFlags}, null, __paramTypes, null);");
-
-                // Safety check (should not happen if generation is correct).
-                var exceptionMsg = SymbolDisplay.FormatLiteral($"Could not resolve MethodInfo for {method.Name}. This indicates an issue in AspectWeaver.", true);
-                writer.WriteLine($"if ({MethodInfoVar} == null) throw new {InvalidOperationExceptionType}({exceptionMsg});");
-            }
         }
 
         #endregion
