@@ -23,12 +23,15 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         private const string PipelineVar = "__pipeline";
         private const string ServiceProviderVar = "__serviceProvider";
 
-        public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string cachedMethodInfoAccessExpression)
+        public static void EmitPipeline(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string cacheClassName)
         {
             var delegateType = $"{FuncType}<{InvocationContextType}, {ValueTaskType}<{signature.LogicalResultType}>>";
 
             // 1. Resolve IServiceProvider
             EmitServiceProviderResolution(writer, target);
+
+            // Construct the access expression for the cached MethodInfo.
+            var cachedMethodInfoAccessExpression = $"{cacheClassName}.{InterceptorEmitter.CachedMethodInfoFieldName}";
 
             // 2. Create InvocationContext
             string targetInstanceExpression = signature.IsInstanceMethod ? MethodSignature.InstanceParameterName : "null";
@@ -38,7 +41,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             EmitCoreDelegate(writer, target, signature, delegateType);
 
             // 4. Build the Aspect Chain
-            EmitAspectChain(writer, target, signature);
+            EmitAspectChain(writer, target, signature, cacheClassName);
 
             // 5. Execute the Pipeline
             EmitPipelineExecution(writer, signature);
@@ -163,7 +166,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         #endregion
 
         #region Step 4: Aspect Chain
-        private static void EmitAspectChain(IndentedWriter writer, InterceptionTarget target, MethodSignature signature)
+        private static void EmitAspectChain(IndentedWriter writer, InterceptionTarget target, MethodSignature signature, string cacheClassName)
         {
             writer.WriteLine("// 4. Wrapping: Apply aspects (from inner to outer).");
 
@@ -171,11 +174,11 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             foreach (var aspect in target.AppliedAspects.Reverse())
             {
                 index--;
-                EmitAspectWrapper(writer, aspect, signature, index);
+                EmitAspectWrapper(writer, aspect, signature, index, cacheClassName);
             }
         }
 
-        private static void EmitAspectWrapper(IndentedWriter writer, AspectInfo aspect, MethodSignature signature, int index)
+        private static void EmitAspectWrapper(IndentedWriter writer, AspectInfo aspect, MethodSignature signature, int index, string cacheClassName)
         {
             var attributeType = aspect.AttributeData.AttributeClass!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
             var handlerInterfaceType = $"{AspectHandlerType}<{attributeType}>";
@@ -187,14 +190,18 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
 
             var handlerVar = $"__handler{index}";
 
+            // Use nullable cast (?) to satisfy CS8600 in strict mode.
             writer.WriteLine($"var {handlerVar} = ({handlerInterfaceType}?){ServiceProviderVar}.GetService(typeof({handlerInterfaceType}));");
 
             var exceptionMessageLiteral = SymbolDisplay.FormatLiteral($"Handler not registered for aspect: {attributeType}", true);
             writer.WriteLine($"if ({handlerVar} == null) throw new {InvalidOperationExceptionType}({exceptionMessageLiteral});");
 
 
+            // Access the cached attribute instance instead of rehydrating locally.
+            // Example: var __attribute0 = Interceptor0_Cache.Attribute_0;
             var attributeVar = $"__attribute{index}";
-            EmitAttributeRehydration(writer, attributeVar, attributeType, aspect.AttributeData);
+            var cachedAttributeAccessExpression = $"{cacheClassName}.{InterceptorEmitter.AttributePrefix}{index}";
+            writer.WriteLine($"var {attributeVar} = {cachedAttributeAccessExpression};");
 
             writer.WriteLine($"{PipelineVar} = (ctx) =>");
             writer.OpenBlock();
@@ -202,61 +209,6 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.CloseBlock(suffix: ";");
             writer.WriteLine();
         }
-
-        #region Attribute Rehydration
-        private static void EmitAttributeRehydration(IndentedWriter writer, string varName, string attributeType, AttributeData attributeData)
-        {
-            var constructorArgs = string.Join(", ", attributeData.ConstructorArguments.Select(arg => TypedConstantToString(arg)));
-            var namedArgs = string.Join(", ", attributeData.NamedArguments.Select(kvp => $"{kvp.Key} = {TypedConstantToString(kvp.Value)}"));
-
-            writer.Write($"var {varName} = new {attributeType}({constructorArgs})");
-
-            if (!string.IsNullOrEmpty(namedArgs))
-            {
-                writer.WriteLine();
-                writer.OpenBlock();
-                writer.WriteLine(namedArgs);
-                writer.CloseBlock(";");
-            }
-            else
-            {
-                writer.WriteLine(";");
-            }
-        }
-
-        private static string TypedConstantToString(TypedConstant constant)
-        {
-            if (constant.IsNull) return "null";
-
-            if (constant.Kind == TypedConstantKind.Primitive)
-            {
-                if (constant.Value is string s)
-                {
-                    return SymbolDisplay.FormatLiteral(s, true);
-                }
-                if (constant.Value is bool b) return b ? "true" : "false";
-                if (constant.Value is char c)
-                {
-                    return SymbolDisplay.FormatLiteral(c, true);
-                }
-
-                return global::System.Convert.ToString(constant.Value, global::System.Globalization.CultureInfo.InvariantCulture);
-            }
-
-            if (constant.Kind == TypedConstantKind.Enum)
-            {
-                var enumType = constant.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
-                return $"({enumType})({constant.Value})";
-            }
-
-            if (constant.Kind == TypedConstantKind.Type && constant.Value is ITypeSymbol typeSymbol)
-            {
-                return $"typeof({typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included))})";
-            }
-
-            return "default";
-        }
-        #endregion
         #endregion
 
         #region Step 5: Execution

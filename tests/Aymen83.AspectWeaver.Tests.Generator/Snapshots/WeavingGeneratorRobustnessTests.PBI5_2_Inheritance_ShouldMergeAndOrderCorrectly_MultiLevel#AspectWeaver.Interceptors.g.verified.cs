@@ -51,7 +51,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next3 = __pipeline;
             var __handler3 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectBAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectBAttribute>));
             if (__handler3 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::AspectBAttribute");
-            var __attribute3 = new global::AspectBAttribute();
+            var __attribute3 = Interceptor0_Cache.Attribute_3;
             __pipeline = (ctx) =>
             {
                 return __handler3.InterceptAsync<global::Aymen83.AspectWeaver.Abstractions.VoidResult>(__attribute3, ctx, __next3);
@@ -61,7 +61,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next2 = __pipeline;
             var __handler2 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectAAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectAAttribute>));
             if (__handler2 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::AspectAAttribute");
-            var __attribute2 = new global::AspectAAttribute();
+            var __attribute2 = Interceptor0_Cache.Attribute_2;
             __pipeline = (ctx) =>
             {
                 return __handler2.InterceptAsync<global::Aymen83.AspectWeaver.Abstractions.VoidResult>(__attribute2, ctx, __next2);
@@ -71,7 +71,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next1 = __pipeline;
             var __handler1 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectCAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectCAttribute>));
             if (__handler1 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::AspectCAttribute");
-            var __attribute1 = new global::AspectCAttribute();
+            var __attribute1 = Interceptor0_Cache.Attribute_1;
             __pipeline = (ctx) =>
             {
                 return __handler1.InterceptAsync<global::Aymen83.AspectWeaver.Abstractions.VoidResult>(__attribute1, ctx, __next1);
@@ -81,7 +81,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next0 = __pipeline;
             var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::UniqueAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::UniqueAspectAttribute>));
             if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::UniqueAspectAttribute");
-            var __attribute0 = new global::UniqueAspectAttribute();
+            var __attribute0 = Interceptor0_Cache.Attribute_0;
             __pipeline = (ctx) =>
             {
                 return __handler0.InterceptAsync<global::Aymen83.AspectWeaver.Abstractions.VoidResult>(__attribute0, ctx, __next0);
@@ -97,6 +97,34 @@ namespace Aymen83.AspectWeaver.Generated
         private static class Interceptor0_Cache
         {
             internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            internal static readonly global::AspectBAttribute Attribute_3 = InitAttribute_3();
+            
+            private static global::AspectBAttribute InitAttribute_3()
+            {
+                return new global::AspectBAttribute();
+            }
+            
+            internal static readonly global::AspectAAttribute Attribute_2 = InitAttribute_2();
+            
+            private static global::AspectAAttribute InitAttribute_2()
+            {
+                return new global::AspectAAttribute();
+            }
+            
+            internal static readonly global::AspectCAttribute Attribute_1 = InitAttribute_1();
+            
+            private static global::AspectCAttribute InitAttribute_1()
+            {
+                return new global::AspectCAttribute();
+            }
+            
+            internal static readonly global::UniqueAspectAttribute Attribute_0 = InitAttribute_0();
+            
+            private static global::UniqueAspectAttribute InitAttribute_0()
+            {
+                return new global::UniqueAspectAttribute();
+            }
             
             private static MethodInfo InitMethodInfo()
             {
@@ -144,7 +172,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next1 = __pipeline;
             var __handler1 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectAAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::AspectAAttribute>));
             if (__handler1 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::AspectAAttribute");
-            var __attribute1 = new global::AspectAAttribute();
+            var __attribute1 = Interceptor1_Cache.Attribute_1;
             __pipeline = (ctx) =>
             {
                 return __handler1.InterceptAsync<global::Aymen83.AspectWeaver.Abstractions.VoidResult>(__attribute1, ctx, __next1);
@@ -154,7 +182,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next0 = __pipeline;
             var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::UniqueAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::UniqueAspectAttribute>));
             if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::UniqueAspectAttribute");
-            var __attribute0 = new global::UniqueAspectAttribute();
+            var __attribute0 = Interceptor1_Cache.Attribute_0;
             __pipeline = (ctx) =>
             {
                 return __handler0.InterceptAsync<global::Aymen83.AspectWeaver.Abstractions.VoidResult>(__attribute0, ctx, __next0);
@@ -170,6 +198,20 @@ namespace Aymen83.AspectWeaver.Generated
         private static class Interceptor1_Cache
         {
             internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            internal static readonly global::AspectAAttribute Attribute_1 = InitAttribute_1();
+            
+            private static global::AspectAAttribute InitAttribute_1()
+            {
+                return new global::AspectAAttribute();
+            }
+            
+            internal static readonly global::UniqueAspectAttribute Attribute_0 = InitAttribute_0();
+            
+            private static global::UniqueAspectAttribute InitAttribute_0()
+            {
+                return new global::UniqueAspectAttribute();
+            }
             
             private static MethodInfo InitMethodInfo()
             {

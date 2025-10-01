@@ -14,9 +14,11 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
         private const string GeneratedNamespace = "Aymen83.AspectWeaver.Generated";
         private const string GeneratedClassName = "Interceptors";
         private const string CacheSuffix = "_Cache";
-        private const string CachedMethodInfoFieldName = "MethodInfo";
+        internal const string CachedMethodInfoFieldName = "MethodInfo";
         private const string InitMethodName = "InitMethodInfo";
         private const string InterceptMethodPrefix = "InterceptMethod";
+        internal const string AttributePrefix = "Attribute_";
+        private const string InitAttributePrefix = "InitAttribute_";
 
         public static string Emit(ImmutableArray<InterceptionTarget> targets)
         {
@@ -88,15 +90,54 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
             writer.OpenBlock();
 
             // 1. The cached static field, initialized via the InitMethodInfo method.
-            EmitCachedField(writer);
+            EmitCachedMethodInfoField(writer);
 
-            // 2. The initialization method (runs once per type).
+            // 2. Attribute caching
+            EmitAttributeCache(writer, target);
+
+            // 3. The initialization method (runs once per type).
             EmitInitializationMethod(writer, target);
 
             writer.CloseBlock();
         }
 
-        private static void EmitCachedField(IndentedWriter writer)
+        // generate attribute cache fields and initialization methods.
+        private static void EmitAttributeCache(IndentedWriter writer, InterceptionTarget target)
+        {
+            // We iterate in reverse order because the pipeline wraps from inner to outer (LIFO).
+            // This ensures the indices match the pipeline generation logic in PipelineEmitter.
+            int index = target.AppliedAspects.Length;
+            foreach (var aspect in target.AppliedAspects.Reverse())
+            {
+                index--;
+                var attributeTypeFQN = aspect.AttributeData.AttributeClass!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included));
+                var fieldName = $"{AttributePrefix}{index}";
+                var initMethodName = $"{InitAttributePrefix}{index}";
+
+                // 1. Emit the cached field: internal static readonly AttributeType Attribute_X = InitAttribute_X();
+                writer.WriteLine($"internal static readonly {attributeTypeFQN} {fieldName} = {initMethodName}();");
+                writer.WriteLine();
+
+                // 2. Emit the initialization method.
+                EmitAttributeInitializationMethod(writer, aspect.AttributeData, attributeTypeFQN, initMethodName);
+            }
+        }
+
+        // generate the static initialization logic for an attribute.
+        private static void EmitAttributeInitializationMethod(IndentedWriter writer, AttributeData attributeData, string attributeTypeFQN, string initMethodName)
+        {
+            writer.WriteLine($"private static {attributeTypeFQN} {initMethodName}()");
+            writer.OpenBlock();
+
+            // Use the centralized AttributeEmitter to generate the instantiation code.
+            var instantiationExpression = AttributeEmitter.GenerateAttributeInstantiation(attributeData);
+            writer.WriteLine($"return {instantiationExpression};");
+
+            writer.CloseBlock();
+            writer.WriteLine();
+        }
+
+        private static void EmitCachedMethodInfoField(IndentedWriter writer)
         {
             // This static readonly field holds the MethodInfo, initialized by InitMethodInfo().
             // Initialization is thread-safe and lazy due to the nature of static constructors.
@@ -200,12 +241,7 @@ namespace Aymen83.AspectWeaver.Generator.Emitters
 
             // 4. Emit the method body
             writer.OpenBlock();
-
-            // Construct the access expression for the cached field in the nested class.
-            // Example: Interceptor0_Cache.MethodInfo
-            var cachedMethodInfoAccessExpression = $"{cacheClassName}.{CachedMethodInfoFieldName}";
-
-            PipelineEmitter.EmitPipeline(writer, target, signature, cachedMethodInfoAccessExpression);
+            PipelineEmitter.EmitPipeline(writer, target, signature, cacheClassName);
             writer.CloseBlock();
         }
 

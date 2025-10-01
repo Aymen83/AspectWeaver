@@ -53,7 +53,7 @@ namespace Aymen83.AspectWeaver.Generated
             var __next0 = __pipeline;
             var __handler0 = (global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::MyTestAspectAttribute>?)__serviceProvider.GetService(typeof(global::Aymen83.AspectWeaver.Abstractions.IAspectHandler<global::MyTestAspectAttribute>));
             if (__handler0 == null) throw new global::System.InvalidOperationException("Handler not registered for aspect: global::MyTestAspectAttribute");
-            var __attribute0 = new global::MyTestAspectAttribute();
+            var __attribute0 = Interceptor0_Cache.Attribute_0;
             __pipeline = (ctx) =>
             {
                 return __handler0.InterceptAsync<int>(__attribute0, ctx, __next0);
@@ -70,6 +70,13 @@ namespace Aymen83.AspectWeaver.Generated
         private static class Interceptor0_Cache
         {
             internal static readonly MethodInfo MethodInfo = InitMethodInfo();
+            
+            internal static readonly global::MyTestAspectAttribute Attribute_0 = InitAttribute_0();
+            
+            private static global::MyTestAspectAttribute InitAttribute_0()
+            {
+                return new global::MyTestAspectAttribute();
+            }
             
             private static MethodInfo InitMethodInfo()
             {
